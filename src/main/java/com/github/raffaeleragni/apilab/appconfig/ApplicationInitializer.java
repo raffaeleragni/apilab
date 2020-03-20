@@ -15,12 +15,16 @@
  */
 package com.github.raffaeleragni.apilab.appconfig;
 
-import com.rabbitmq.client.Channel;
-import java.io.IOException;
+import com.github.raffaeleragni.apilab.queues.QueueListener;
+import io.javalin.core.security.Role;
+import java.util.Set;
+import java.util.function.Function;
+import org.immutables.value.Value;
+import org.immutables.value.Value.Default;
 
-@FunctionalInterface
-public interface ChannelConsumer {
-
-  void channelAccept(Channel t) throws IOException;
-  
+@Value.Immutable
+public interface ApplicationInitializer {
+  @Default default Function<String, Role> roleMapper() { return s -> new Role(){}; }
+  Set<Endpoint> endpoints();
+  Set<QueueListener> consumers();
 }

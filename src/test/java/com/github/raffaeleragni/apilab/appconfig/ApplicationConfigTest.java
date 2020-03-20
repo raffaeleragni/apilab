@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019 Raffaele Ragni.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.raffaeleragni.apilab.appconfig;
 
 import com.rabbitmq.client.Connection;
@@ -30,18 +45,36 @@ public class ApplicationConfigTest {
   
   @Test
   public void testNoJavalinStartup() {
-    var config = new ApplicationConfig();
-    var env = mock(Env.class);
     var endpoint = mock(Endpoint.class);
+    var config = new ApplicationConfig(ImmutableApplicationInitializer.builder()
+        .roleMapper(s -> new Role(){})
+        .endpoints(Set.of(endpoint))
+        .build());
+    var env = mock(Env.class);
     when(env.get(Env.Vars.API_ENABLE_ENDPOINTS)).thenReturn("false");
     
     config.javalin(env,
-      s -> new Role(){}, 
-      Set.of(endpoint),
       config.objectMapper(),
       () -> Map.of("db", true));
     
     verify(endpoint, times(0)).register(any());
+  }
+  
+  @Test
+  public void testJavalinStartup() {
+    var endpoint = mock(Endpoint.class);
+    var config = new ApplicationConfig(ImmutableApplicationInitializer.builder()
+        .roleMapper(s -> new Role(){})
+        .endpoints(Set.of(endpoint))
+        .build());
+    var env = mock(Env.class);
+    when(env.get(Env.Vars.API_ENABLE_ENDPOINTS)).thenReturn("true");
+    
+    config.javalin(env,
+      config.objectMapper(),
+      () -> Map.of("db", true));
+    
+    verify(endpoint).register(any());
   }
   
   @Test

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019 Raffaele Ragni.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.raffaeleragni.apilab.appconfig;
 
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_CONSUMERS;
@@ -27,9 +42,19 @@ public class Application {
   public Application() {
     // Injection constructor
   }
+  
+  public static Application create(ApplicationInitializer initializer) {
+    return DaggerApplicationComponent
+      .builder()
+      .applicationConfig(new ApplicationConfig(initializer))
+      .build()
+      .application();
+  }
 
   public void start() throws IOException {
 
+    java.security.Security.setProperty("networkaddress.cache.ttl" , "60");
+    
     boolean enableMigrations = Optional.ofNullable(env.get(API_ENABLE_MIGRATION))
         .map(Boolean::valueOf)
         .orElse(false);
@@ -49,7 +74,7 @@ public class Application {
     }
     
     javalin.start();
-    JettyHttp2Creator.startMetrics();
+    JettyHttp2Creator.startMetrics(env);
 
     long vmStartTime = ManagementFactory.getRuntimeMXBean().getStartTime();
     long currentTime = System.currentTimeMillis();

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019 Raffaele Ragni.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.raffaeleragni.apilab.appconfig;
 
 import com.auth0.jwt.algorithms.Algorithm;
@@ -16,21 +31,15 @@ import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_RABBITMQ_PA
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_RABBITMQ_PORT;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_RABBITMQ_USERNAME;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_REDIS_URL;
-import com.github.raffaeleragni.apilab.auth.ImmutableConfiguration;
 import com.github.raffaeleragni.apilab.auth.JavalinJWTAccessManager;
 import com.github.raffaeleragni.apilab.auth.JavalinJWTFilter;
 import com.github.raffaeleragni.apilab.exceptions.ApplicationException;
 import com.github.raffaeleragni.apilab.http2.JettyHttp2Creator;
 import com.github.raffaeleragni.apilab.metric.HealthCheckPlugin;
-import com.github.raffaeleragni.apilab.queues.QueueListener;
-import com.rabbitmq.client.Delivery;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import dagger.Provides;
-import dagger.multibindings.IntoSet;
 import io.javalin.Javalin;
-import io.javalin.core.security.Role;
-import io.javalin.http.Context;
 import io.javalin.plugin.json.JavalinJackson;
 import io.javalin.plugin.openapi.OpenApiOptions;
 import io.javalin.plugin.openapi.OpenApiPlugin;
@@ -43,9 +52,7 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
-import java.util.Set;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -59,61 +66,29 @@ import liquibase.resource.FileSystemResourceAccessor;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.github.raffaeleragni.apilab.auth.ImmutableConfiguration;
+import com.github.raffaeleragni.apilab.queues.QueueListener;
+import java.util.Set;
 
 @dagger.Module
 public class ApplicationConfig {
 
   private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfig.class);
-
-  // TODO This is to be overridden by the implementing project
   
-  @Provides Function<String, Role> roleMapper() {
-    return s -> new Role() {};
+  private final ApplicationInitializer initializer;
+
+  public ApplicationConfig() {
+    this.initializer = ImmutableApplicationInitializer.builder().build();
   }
   
-  @Provides @IntoSet Endpoint sampleEndpoint() {
-    return new Endpoint() {
-      @Override
-      public void register(Javalin javalin) {
-      }
-
-      @Override
-      public void handle(Context ctx) throws Exception {
-      }
-    };
+  public ApplicationConfig(ApplicationInitializer initializer) {
+    this.initializer = initializer;
   }
-  
-  @Provides @IntoSet QueueListener sampleQueueListner() {
-    return new QueueListener() {
-      Optional<Runnable> callback;
-      
-      @Override
-      public void setDeregisterCallback(Optional<Runnable> callback) {
-        this.callback = callback;
-      }
 
-      @Override
-      public Optional<Runnable> getDeregisterCallback() {
-        return callback;
-      }
-
-      @Override
-      public String getQueueName() {
-        return "name";
-      }
-
-      @Override
-      public void receive(Delivery message) {
-      }
-    };
-  }
-  
   // Main web server
 
   @Provides @Singleton Javalin javalin(
       Env env,
-      Function<String, Role> roleMapper,
-      Set<Endpoint> endpoints,
       ObjectMapper objectMapper,
       @Named("healthcheck") Supplier<Map<String, Boolean>> healthcheck) {
 
@@ -121,11 +96,11 @@ public class ApplicationConfig {
     
     var javalin = Javalin.create(config -> {
       config.showJavalinBanner = false;
-      config.server(JettyHttp2Creator::createHttp2Server);
+      config.server(() -> JettyHttp2Creator.createHttp2Server(env));
       config.accessManager(new JavalinJWTAccessManager());
       config.registerPlugin(new OpenApiPlugin(getOpenApiOptions()));
       config.registerPlugin(new JavalinJWTFilter(ImmutableConfiguration.builder()
-        .roleMapper(roleMapper)
+        .roleMapper(initializer.roleMapper())
         .jwtSecret(Algorithm.HMAC256(
           Optional.ofNullable(
             env.get(API_JWT_SECRET)).orElse("")
@@ -144,7 +119,7 @@ public class ApplicationConfig {
         .orElse(true);
     if (enabledEndpoints) {
       LOG.info("## ENDPOINTS ENABLED");
-      endpoints.stream().forEach(e -> {
+      initializer.endpoints().stream().forEach(e -> {
         LOG.info("## ENDPOINTS Registering {}", e.getClass().getName());
         e.register(javalin);
       });
@@ -154,19 +129,11 @@ public class ApplicationConfig {
 
     return javalin;
   }
-
-  // Endpoints into sets
-
-//  @Provides @IntoSet Endpoint testEndpoint(TestEndpoint endpoint) {
-//    return endpoint;
-//  }
-
-  // Queue listeners into set
   
-//  @Provides @IntoSet QueueListener registerSLEntityHeaderListener(MyListener listener) {
-//    return listener;
-//  }
-
+  @Provides Set<QueueListener> consumers() {
+    return initializer.consumers();
+  }
+  
   // Persistence
   
   @Provides @Singleton @Named("healthcheck") Supplier<Map<String, Boolean>> healthcheck(

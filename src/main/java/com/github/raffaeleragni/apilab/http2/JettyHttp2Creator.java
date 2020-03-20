@@ -15,6 +15,12 @@
  */
 package com.github.raffaeleragni.apilab.http2;
 
+import com.github.raffaeleragni.apilab.appconfig.Env;
+import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.JAVALIN_HTTP2_PORT;
+import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.JAVALIN_HTTPS2_CERT_CLASSPATH;
+import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.JAVALIN_HTTPS2_CERT_PASSWORD;
+import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.JAVALIN_HTTPS2_PORT;
+import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.JAVALIN_PROMETHEUS_PORT;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.hotspot.DefaultExports;
@@ -47,13 +53,14 @@ public class JettyHttp2Creator {
   /**
    * Starts the metrics server.
    * Port is set via env JAVALIN_PROMETHEUS_PORT.
+   * @param env the environment container
    * @throws IOException exception on prometheus port
    */
-  public static void startMetrics() throws IOException {
+  public static void startMetrics(Env env) throws IOException {
     if (metricServer != null) {
       metricServer.stop();
     }
-    metricServer = new HTTPServer(getPrometheusPort());
+    metricServer = new HTTPServer(getPrometheusPort(env));
   }
   
   /**
@@ -63,6 +70,7 @@ public class JettyHttp2Creator {
     if (metricServer != null) {
       metricServer.stop();
     }
+    metricServer = null;
   }
 
   /**
@@ -83,10 +91,10 @@ public class JettyHttp2Creator {
    * - JAVALIN_HTTPS2_CERT_PASSWORD: "password" (system property is getHttps2CertPassword)
    *
    * System properties take over environment variables.
-   *
+   * @param env the environment container
    * @return Jetty server
    */
-  public static Server createHttp2Server() {
+  public static Server createHttp2Server(Env env) {
     
     StatisticsHandler statisticsHandler = new StatisticsHandler();
     CollectorRegistry.defaultRegistry.clear();
@@ -98,22 +106,22 @@ public class JettyHttp2Creator {
     server.setHandler(statisticsHandler);
     
     ServerConnector connector = new ServerConnector(server);
-    connector.setPort(getHttp2Port());
+    connector.setPort(getHttp2Port(env));
     server.addConnector(connector);
 
     // HTTP Configuration
     HttpConfiguration httpConfig = new HttpConfiguration();
     httpConfig.setSendServerVersion(false);
     httpConfig.setSecureScheme("https");
-    httpConfig.setSecurePort(getHttps2Port());
+    httpConfig.setSecurePort(getHttps2Port(env));
 
     // SSL Context Factory for HTTPS and HTTP/2
     SslContextFactory sslContextFactory = new SslContextFactory.Server();
     // replace with your real keystore
     sslContextFactory.setKeyStorePath(JettyHttp2Creator.class
-      .getResource(getHttps2CertClasspath()).toExternalForm());
+      .getResource(getHttps2CertClasspath(env)).toExternalForm());
     // replace with your real password
-    sslContextFactory.setKeyStorePassword(getHttps2CertPassword());
+    sslContextFactory.setKeyStorePassword(getHttps2CertPassword(env));
     sslContextFactory.setCipherComparator(HTTP2Cipher.COMPARATOR);
     sslContextFactory.setProvider("Conscrypt");
 
@@ -131,55 +139,37 @@ public class JettyHttp2Creator {
 
     // HTTP/2 Connector
     ServerConnector http2Connector = new ServerConnector(server, ssl, alpn, h2, new HttpConnectionFactory(httpsConfig));
-    http2Connector.setPort(getHttps2Port());
+    http2Connector.setPort(getHttps2Port(env));
     server.addConnector(http2Connector);
 
     return server;
   }
 
-  private static int getPrometheusPort() {
-    return ofNullable(System.getProperty("javalinPrometheusPort"))
-          .map(Integer::valueOf)
-          .orElseGet(() ->
-            ofNullable(System.getenv("JAVALIN_PROMETHEUS_PORT"))
+  private static int getPrometheusPort(Env env) {
+    return ofNullable(env.get(JAVALIN_PROMETHEUS_PORT))
               .map(Integer::valueOf)
-              .orElse(7080)
-          );
+              .orElse(7080);
   }
   
-  private static int getHttp2Port() {
-    return ofNullable(System.getProperty("javalinHttp2Port"))
-          .map(Integer::valueOf)
-          .orElseGet(() ->
-            ofNullable(System.getenv("JAVALIN_HTTP2_PORT"))
+  private static int getHttp2Port(Env env) {
+    return ofNullable(env.get(JAVALIN_HTTP2_PORT))
               .map(Integer::valueOf)
-              .orElse(8080)
-          );
+              .orElse(8080);
   }
 
-  private static int getHttps2Port() {
-    return ofNullable(System.getProperty("javalinHttps2Port"))
-          .map(Integer::valueOf)
-          .orElseGet(() ->
-            ofNullable(System.getenv("JAVALIN_HTTPS2_PORT"))
-              .map(Integer::valueOf)
-              .orElse(8443)
-          );
+  private static int getHttps2Port(Env env) {
+    return ofNullable(env.get(JAVALIN_HTTPS2_PORT))
+      .map(Integer::valueOf)
+      .orElse(8443);
   }
 
-  private static String getHttps2CertClasspath() {
-    return ofNullable(System.getProperty("javalinHttps2CertClasspath"))
-          .orElseGet(() ->
-            ofNullable(System.getenv("JAVALIN_HTTPS2_CERT_CLASSPATH"))
-              .orElse("/keystore.jks")
-          );
+  private static String getHttps2CertClasspath(Env env) {
+    return ofNullable(env.get(JAVALIN_HTTPS2_CERT_CLASSPATH))
+      .orElse("/keystore.jks");
   }
 
-  private static String getHttps2CertPassword() {
-    return ofNullable(System.getProperty("javalinHttps2CertPassword"))
-          .orElseGet(() ->
-            ofNullable(System.getenv("JAVALIN_HTTPS2_CERT_PASSWORD"))
-              .orElse("password")
-          );
+  private static String getHttps2CertPassword(Env env) {
+    return ofNullable(env.get(JAVALIN_HTTPS2_CERT_PASSWORD))
+      .orElse("password");
   }
 }
