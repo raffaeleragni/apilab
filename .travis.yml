@@ -1,0 +1,14 @@
+language: java
+jdk:
+  - openjdk13
+addons:
+  artifacts: true
+install: true
+jobs:
+  include:
+    - stage: build
+      if: tag IS NOT present
+      script: ./mvnw clean test verify package
+    - stage: deploy
+      if: tag IS present
+      script: ./mvnw clean test verify package deploy -Dregistry=https://maven.pkg.github.com/raffaeleragni -Dtoken=$GH_TOKEN
