@@ -1,4 +1,4 @@
-package com.github.raffaeleragni.addons;
+package com.github.raffaeleragni.apilab.auth;
 
 import io.javalin.core.security.Role;
 

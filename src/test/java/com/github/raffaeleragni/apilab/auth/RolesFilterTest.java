@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.raffaeleragni.addons;
+package com.github.raffaeleragni.apilab.auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import static com.github.raffaeleragni.addons.Roles.USER;
+import static com.github.raffaeleragni.apilab.auth.Roles.USER;
 import com.github.raffaeleragni.apilab.auth.Configuration;
 import com.github.raffaeleragni.apilab.auth.ImmutableConfiguration;
 import com.github.raffaeleragni.apilab.auth.JavalinJWTFilter;

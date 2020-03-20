@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.raffaeleragni.addons;
+package com.github.raffaeleragni.apilab.auth;
 
 import com.auth0.jwt.algorithms.Algorithm;
-import static com.github.raffaeleragni.addons.Roles.ADMIN;
-import com.github.raffaeleragni.apilab.auth.Configuration;
-import com.github.raffaeleragni.apilab.auth.ImmutableConfiguration;
-import com.github.raffaeleragni.apilab.auth.JavalinJWTCreator;
+import static com.github.raffaeleragni.apilab.auth.Roles.ADMIN;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;

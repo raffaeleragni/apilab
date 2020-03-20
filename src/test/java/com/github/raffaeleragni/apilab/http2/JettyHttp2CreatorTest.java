@@ -15,6 +15,7 @@
  */
 package com.github.raffaeleragni.apilab.http2;
 
+import java.io.IOException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -28,9 +29,25 @@ import org.junit.jupiter.api.Test;
 public class JettyHttp2CreatorTest {
 
   @Test
-  public void testServer() {
+  public void testServer() throws IOException {
     var server = JettyHttp2Creator.createHttp2Server();
     assertThat("Server built", server, is(not(nullValue())));
+  }
+  
+  @Test
+  public void testMetrics() throws IOException {
+
+    JettyHttp2Creator.stopMetrics();
+    
+    JettyHttp2Creator.startMetrics();
+    JettyHttp2Creator.stopMetrics();
+    
+    assertThat("metrics server created", JettyHttp2Creator.metricServer, is(not(nullValue())));
+    
+    JettyHttp2Creator.startMetrics();
+    JettyHttp2Creator.stopMetrics();
+    
+    assertThat("metrics server created", JettyHttp2Creator.metricServer, is(not(nullValue())));
   }
 
 }

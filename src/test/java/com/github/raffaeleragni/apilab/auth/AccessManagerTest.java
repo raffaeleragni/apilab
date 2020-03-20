@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.raffaeleragni.addons;
+package com.github.raffaeleragni.apilab.auth;
 
-import static com.github.raffaeleragni.addons.Roles.ADMIN;
-import static com.github.raffaeleragni.addons.Roles.USER;
-import com.github.raffaeleragni.apilab.auth.JavalinJWTAccessManager;
+import static com.github.raffaeleragni.apilab.auth.Roles.ADMIN;
+import static com.github.raffaeleragni.apilab.auth.Roles.USER;
 import static com.github.raffaeleragni.apilab.auth.JavalinJWTFilter.REQ_ATTR_ROLES;
 import io.javalin.http.Handler;
 import io.javalin.http.util.ContextUtil;

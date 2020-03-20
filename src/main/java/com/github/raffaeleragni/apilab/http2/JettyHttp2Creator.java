@@ -15,6 +15,11 @@
  */
 package com.github.raffaeleragni.apilab.http2;
 
+import io.prometheus.client.CollectorRegistry;
+import io.prometheus.client.exporter.HTTPServer;
+import io.prometheus.client.hotspot.DefaultExports;
+import io.prometheus.client.jetty.JettyStatisticsCollector;
+import java.io.IOException;
 import static java.util.Optional.ofNullable;
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
 import org.eclipse.jetty.http2.HTTP2Cipher;
@@ -25,6 +30,7 @@ import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 /**
@@ -34,6 +40,29 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 public class JettyHttp2Creator {
 
   private JettyHttp2Creator() {
+  }
+
+  static HTTPServer metricServer;
+  
+  /**
+   * Starts the metrics server.
+   * Port is set via env JAVALIN_PROMETHEUS_PORT.
+   * @throws IOException exception on prometheus port
+   */
+  public static void startMetrics() throws IOException {
+    if (metricServer != null) {
+      metricServer.stop();
+    }
+    metricServer = new HTTPServer(getPrometheusPort());
+  }
+  
+  /**
+   * Stops the metrics server.
+   */
+  public static void stopMetrics() {
+    if (metricServer != null) {
+      metricServer.stop();
+    }
   }
 
   /**
@@ -58,8 +87,16 @@ public class JettyHttp2Creator {
    * @return Jetty server
    */
   public static Server createHttp2Server() {
+    
+    StatisticsHandler statisticsHandler = new StatisticsHandler();
+    CollectorRegistry.defaultRegistry.clear();
+    DefaultExports.initialize();
+    new JettyStatisticsCollector(statisticsHandler).register();
+    
     Server server = new Server();
 
+    server.setHandler(statisticsHandler);
+    
     ServerConnector connector = new ServerConnector(server);
     connector.setPort(getHttp2Port());
     server.addConnector(connector);
@@ -100,6 +137,16 @@ public class JettyHttp2Creator {
     return server;
   }
 
+  private static int getPrometheusPort() {
+    return ofNullable(System.getProperty("javalinPrometheusPort"))
+          .map(Integer::valueOf)
+          .orElseGet(() ->
+            ofNullable(System.getenv("JAVALIN_PROMETHEUS_PORT"))
+              .map(Integer::valueOf)
+              .orElse(7080)
+          );
+  }
+  
   private static int getHttp2Port() {
     return ofNullable(System.getProperty("javalinHttp2Port"))
           .map(Integer::valueOf)
