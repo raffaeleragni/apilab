@@ -33,10 +33,25 @@ public class ApplicationExceptionTest {
     assertThat("message taken", ex.getMessage(), is("message"));
     assertThat("cause taken", ex.getCause(), is(t));
     
-    ex = new NotFoundException( "not found message");
+    ex = new NotFoundException("not found message");
     
     assertThat("status taken", ex.getHttpCode(), is(404));
     assertThat("message taken", ex.getMessage(), is("not found message"));
+    
+    ex = new NotAuthenticatedException("not authenticated");
+    
+    assertThat("status taken", ex.getHttpCode(), is(401));
+    assertThat("message taken", ex.getMessage(), is("not authenticated"));
+    
+    ex = new NotAuthorizedException("not authorized");
+    
+    assertThat("status taken", ex.getHttpCode(), is(403));
+    assertThat("message taken", ex.getMessage(), is("not authorized"));
+    
+    ex = new UnprocessableEntityException("unprocessable");
+    
+    assertThat("status taken", ex.getHttpCode(), is(422));
+    assertThat("message taken", ex.getMessage(), is("unprocessable"));
   }
   
 }
