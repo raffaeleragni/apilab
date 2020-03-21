@@ -15,7 +15,7 @@
     <version.immutables>2.8.1</version.immutables>
     <version.dagger>2.24</version.dagger>
     <version.javalin>3.6.0</version.javalin>
-    <version.jwt>3.8.3</version.jwt>
+    <version.jwt>3.10.1</version.jwt>
     <version.jetty>9.4.20.v20190813</version.jetty>
     <version.alpn-api>1.1.3.v20160715</version.alpn-api>
     <version.alpn-boot>8.1.13.v20181017</version.alpn-boot>

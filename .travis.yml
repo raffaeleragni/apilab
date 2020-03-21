@@ -4,9 +4,11 @@ jdk:
 services:
   - docker
 before_install:
-  - docker pull openjdk:13
   - docker-compose up -d
   - sleep 5
+cache:
+  directories:
+  - $HOME/.m2
 addons:
   artifacts: true
 install: true
@@ -17,4 +19,4 @@ jobs:
       script: ./mvnw clean test verify package
     - stage: deploy
       if: tag IS present
-      script: ./mvnw clean test verify package deploy -Dregistry=https://maven.pkg.github.com/raffaeleragni -Dtoken=$GH_TOKEN
+      script: ./mvnw versions:set -DnewVersion=$TRAVIS_TAG clean test verify package deploy -Dregistry=https://maven.pkg.github.com/raffaeleragni -Dtoken=$GH_TOKEN

@@ -17,12 +17,16 @@ package com.github.raffaeleragni.apilab.appconfig;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.github.raffaeleragni.apilab.auth.Roles;
 import com.github.raffaeleragni.apilab.exceptions.NotFoundException;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import java.io.IOException;
+import java.time.Instant;
+import java.util.Date;
 import static java.util.Optional.ofNullable;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import static org.hamcrest.CoreMatchers.is;
@@ -40,7 +44,10 @@ public class EndpointsIT {
 
   @BeforeAll
   public static void prepare() throws Exception {
-    Endpoint e = new Endpoint(){
+    client = new OkHttpClient();
+    app = Application.create(ImmutableApplicationInitializer.builder()
+      .roleMapper(Roles::valueOf)
+      .endpoints(Set.of(new Endpoint() {
         @Override
         public void register(Javalin javalin) {
           javalin.get("/notfound", this);
@@ -50,10 +57,17 @@ public class EndpointsIT {
         public void handle(Context ctx) throws Exception {
           throw new NotFoundException("not found");
         }
-      };
-    client = new OkHttpClient();
-    app = Application.create(ImmutableApplicationInitializer.builder()
-      .endpoints(Set.of(e))
+      }, new Endpoint() {
+        @Override
+        public void register(Javalin javalin) {
+          javalin.get("/secured", this, Set.of((Roles.ADMIN)));
+        }
+
+        @Override
+        public void handle(Context ctx) throws Exception {
+          ctx.result("secured");
+        }
+      }))
       .build());
     app.start();
   }
@@ -66,10 +80,10 @@ public class EndpointsIT {
   @Test
   public void testAll() throws IOException, JSONException {
 
-    var result = get("/status/version", true);
+    var result = get("/status/version", false);
     assertThat("Returned expected result", result, is("{\"version\":\"unknown\"}"));
 
-    result = get("/status/health", true);
+    result = get("/status/health", false);
     JSONAssert.assertEquals("Returned expected result",
         "{\"redis\":true,"
         + "\"database\":true,"
@@ -77,8 +91,11 @@ public class EndpointsIT {
         result,
         true);
     
-    result = get("/notfound", true);
+    result = get("/notfound", false);
     assertThat("404 not found", result, is ("\"not found\""));
+    
+    result = get("/secured", true);
+    assertThat("Token auth works", result, is ("secured"));
   }
 
   private String get(String url, boolean authenticated) throws IOException {
@@ -89,6 +106,9 @@ public class EndpointsIT {
     var rootURL = "http://"+host+":"+port;
     var alg = Algorithm.HMAC256("test");
     var token = JWT.create()
+      .withSubject("admin")
+      .withIssuer("own")
+      .withExpiresAt(Date.from(Instant.now().plusSeconds(TimeUnit.DAYS.toDays(5))))
       .withArrayClaim("roles", new String[]{"admin"})
       .sign(alg);
     var requestBuilder = new Request.Builder()
