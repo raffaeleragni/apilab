@@ -91,7 +91,8 @@ public class ApplicationConfig {
 
   // Main web server
 
-  @Provides @Singleton Javalin javalin(
+  @Provides @Singleton
+  public Javalin javalin(
       Env env,
       ObjectMapper objectMapper,
       @Named("healthcheck") Supplier<Map<String, Boolean>> healthcheck) {
@@ -134,13 +135,14 @@ public class ApplicationConfig {
     return javalin;
   }
   
-  @Provides Set<QueueListener> consumers() {
+  public @Provides Set<QueueListener> consumers() {
     return initializer.consumers();
   }
   
   // Persistence
   
-  @Provides @Singleton @Named("healthcheck") Supplier<Map<String, Boolean>> healthcheck(
+  @Provides @Singleton @Named("healthcheck")
+  public Supplier<Map<String, Boolean>> healthcheck(
       Jdbi jdbi,
       RedisClient redis,
       com.rabbitmq.client.ConnectionFactory rabbitFactory) {
@@ -211,7 +213,7 @@ public class ApplicationConfig {
     return objectMapper;
   }
 
-  void runMigrations(Env env, String url, String username, String password) {
+  public void runMigrations(Env env, String url, String username, String password) {
     
     boolean enableMigrations = Optional.ofNullable(env.get(API_ENABLE_MIGRATION))
        .map(Boolean::valueOf)
@@ -233,7 +235,7 @@ public class ApplicationConfig {
 
   // API Docs
 
-  private OpenApiOptions getOpenApiOptions() {
+  public OpenApiOptions getOpenApiOptions() {
     Info applicationInfo = new Info()
         .version("1.0")
         .description("API");
