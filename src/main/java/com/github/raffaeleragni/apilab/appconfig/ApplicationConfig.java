@@ -18,6 +18,7 @@ package com.github.raffaeleragni.apilab.appconfig;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_DATABASE_MAXPOOLSZE;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_DATABASE_PASSWORD;
@@ -210,6 +211,7 @@ public class ApplicationConfig {
 
     JavaTimeModule module = new JavaTimeModule();
     objectMapper.registerModule(module);
+    objectMapper.registerModule(new Jdk8Module());
     objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     return objectMapper;
   }
