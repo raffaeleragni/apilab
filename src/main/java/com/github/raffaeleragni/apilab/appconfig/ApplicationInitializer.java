@@ -26,6 +26,7 @@ import org.immutables.value.Value.Default;
  * 
  * @author Raffaele Ragni
  */
+@Value.Style(jdkOnly = true)
 @Value.Immutable
 public interface ApplicationInitializer {
   @Default default Function<String, Role> roleMapper() { return s -> new Role(){}; }
