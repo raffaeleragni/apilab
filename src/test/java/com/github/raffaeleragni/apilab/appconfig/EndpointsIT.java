@@ -17,6 +17,7 @@ package com.github.raffaeleragni.apilab.appconfig;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_JWT_SECRET;
 import com.github.raffaeleragni.apilab.auth.Roles;
 import com.github.raffaeleragni.apilab.exceptions.NotFoundException;
 import io.javalin.Javalin;
@@ -45,6 +46,7 @@ public class EndpointsIT {
   @BeforeAll
   public static void prepare() throws Exception {
     client = new OkHttpClient();
+    System.setProperty(API_JWT_SECRET.name(), "test");
     app = Application.create(ImmutableApplicationInitializer.builder()
       .roleMapper(Roles::valueOf)
       .endpoints(Set.of(new Endpoint() {
