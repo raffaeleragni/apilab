@@ -15,6 +15,10 @@
  */
 package com.github.raffaeleragni.apilab.exceptions;
 
+/**
+ * 
+ * @author Raffaele Ragni
+ */
 public class NotFoundException extends ApplicationException {
   
   public NotFoundException(String message) {

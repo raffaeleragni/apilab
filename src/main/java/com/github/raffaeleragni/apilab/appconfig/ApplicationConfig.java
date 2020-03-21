@@ -70,6 +70,10 @@ import com.github.raffaeleragni.apilab.auth.ImmutableConfiguration;
 import com.github.raffaeleragni.apilab.queues.QueueListener;
 import java.util.Set;
 
+/**
+ * 
+ * @author Raffaele Ragni
+ */
 @dagger.Module
 public class ApplicationConfig {
 

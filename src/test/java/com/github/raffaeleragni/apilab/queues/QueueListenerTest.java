@@ -29,6 +29,10 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ * 
+ * @author Raffaele Ragni
+ */
 public class QueueListenerTest {
    
   @Test

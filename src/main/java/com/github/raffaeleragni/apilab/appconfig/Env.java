@@ -17,6 +17,10 @@ package com.github.raffaeleragni.apilab.appconfig;
 
 import javax.inject.Inject;
 
+/**
+ * 
+ * @author Raffaele Ragni
+ */
 public class Env {
   
   public enum Vars {

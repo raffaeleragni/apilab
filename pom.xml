@@ -318,11 +318,74 @@
           </includes>
         </configuration>
       </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.2.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.1.1</version>
+        <configuration>
+          <!-- This is necessary for gpg to not try to use the pinentry programs -->
+          <gpgArguments>
+            <arg>--no-tty</arg>
+            <arg>--batch</arg>
+            <arg>--yes</arg>
+            <arg>--pinentry-mode</arg>
+            <arg>loopback</arg>
+          </gpgArguments>
+          <sourcepath>${project.basedir}/src/main/java;${project.basedir}/target/generated-sources/annotations</sourcepath>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 
+      
     </plugins>
   </build>
 
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses><developers>
+    <developer>
+      <name>Raffaele Ragni</name>
+      <email>raffaele.ragni@gmail.com</email>
+      <organizationUrl>https://github.com/raffaeleragni</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>https://github.com/raffaeleragni/tinder.git</connection>
+    <url>https://github.com/raffaeleragni/tinder</url>
+  </scm>
+
   <distributionManagement>
+    <site>
+      <id>tinder.wiki</id>
+      <url>https://github.com/raffaeleragni/wiki</url>
+    </site>
     <repository>
       <id>github</id>
       <name>GitHub OWNER Apache Maven Packages</name>

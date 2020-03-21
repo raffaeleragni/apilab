@@ -30,6 +30,10 @@ import javax.inject.Inject;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 
+ * @author Raffaele Ragni
+ */
 public class Application {
   private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Application.class);
 

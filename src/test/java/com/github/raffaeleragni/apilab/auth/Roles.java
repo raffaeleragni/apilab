@@ -17,6 +17,10 @@ package com.github.raffaeleragni.apilab.auth;
 
 import io.javalin.core.security.Role;
 
+/**
+ * 
+ * @author Raffaele Ragni
+ */
 public enum Roles implements Role {
   NONE, USER, ADMIN
 }

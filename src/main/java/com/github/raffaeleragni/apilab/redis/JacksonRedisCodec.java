@@ -23,6 +23,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * 
+ * @author Raffaele Ragni
+ */
 public class JacksonRedisCodec<T> implements RedisCodec<String, T> {
 
   private final ObjectMapper mapper;

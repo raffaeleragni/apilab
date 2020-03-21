@@ -22,6 +22,10 @@ import java.util.function.Function;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Default;
 
+/**
+ * 
+ * @author Raffaele Ragni
+ */
 @Value.Immutable
 public interface ApplicationInitializer {
   @Default default Function<String, Role> roleMapper() { return s -> new Role(){}; }

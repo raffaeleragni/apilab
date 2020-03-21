@@ -15,6 +15,10 @@
  */
 package com.github.raffaeleragni.apilab.exceptions;
 
+/**
+ * 
+ * @author Raffaele Ragni
+ */
 public class ApplicationException extends RuntimeException {
 
   private final int httpCode;

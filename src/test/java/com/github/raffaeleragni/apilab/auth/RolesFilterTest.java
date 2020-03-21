@@ -35,6 +35,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * 
+ * @author Raffaele Ragni
+ */
 public class RolesFilterTest {
 
   private static final Configuration BASE_CONFIG = ImmutableConfiguration.builder()

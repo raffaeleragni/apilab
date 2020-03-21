@@ -38,6 +38,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
+/**
+ * 
+ * @author Raffaele Ragni
+ */
 public class EndpointsIT {
 
   static OkHttpClient client;

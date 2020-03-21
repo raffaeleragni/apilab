@@ -10,6 +10,10 @@ import static java.util.Optional.empty;
 import java.util.concurrent.TimeoutException;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 
+ * @author Raffaele Ragni
+ */
 public interface QueueListener extends DeliverCallback {
  
   void setDeregisterCallback(Optional<Runnable> callback);
