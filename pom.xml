@@ -189,6 +189,11 @@
       <artifactId>swagger-ui</artifactId>
       <version>${version.swagger-ui}</version>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.module</groupId>
+      <artifactId>jackson-module-kotlin</artifactId>
+      <version>${version.jackson}</version>
+    </dependency>
     <!-- Database and pooler, and migration tool -->
     <dependency>
       <groupId>com.zaxxer</groupId>
