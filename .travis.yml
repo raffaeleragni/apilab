@@ -1,6 +1,12 @@
 language: java
 jdk:
   - openjdk13
+services:
+  - docker
+before_install:
+  - docker pull openjdk:13
+  - docker-compose up -d
+  - sleep 5
 addons:
   artifacts: true
 install: true
