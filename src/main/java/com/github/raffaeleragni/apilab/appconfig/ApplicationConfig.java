@@ -68,6 +68,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.github.raffaeleragni.apilab.auth.ImmutableConfiguration;
 import com.github.raffaeleragni.apilab.queues.QueueListener;
+import dagger.multibindings.ElementsIntoSet;
 import java.util.Set;
 
 /**
@@ -135,7 +136,7 @@ public class ApplicationConfig {
     return javalin;
   }
   
-  public @Provides Set<QueueListener> consumers() {
+  public @Provides @ElementsIntoSet Set<QueueListener> consumers() {
     return initializer.consumers();
   }
   
