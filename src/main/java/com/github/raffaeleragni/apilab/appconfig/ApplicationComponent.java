@@ -15,8 +15,13 @@
  */
 package com.github.raffaeleragni.apilab.appconfig;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabbitmq.client.ConnectionFactory;
 import dagger.Component;
+import io.javalin.Javalin;
+import io.lettuce.core.RedisClient;
 import javax.inject.Singleton;
+import org.jdbi.v3.core.Jdbi;
 
 /**
  * 
@@ -26,4 +31,10 @@ import javax.inject.Singleton;
 @Singleton
 public interface ApplicationComponent {
   Application application();
+  
+  Javalin javalin();
+  ObjectMapper objectMapper();
+  Jdbi jdbi();
+  ConnectionFactory rabbit();
+  RedisClient redis();
 }
