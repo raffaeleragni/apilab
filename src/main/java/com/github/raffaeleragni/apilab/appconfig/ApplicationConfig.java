@@ -236,9 +236,11 @@ public class ApplicationConfig {
   private OpenApiOptions getOpenApiOptions() {
     Info applicationInfo = new Info()
         .version("1.0")
-        .description("My Application");
+        .description("API");
     return new OpenApiOptions(applicationInfo).path("/swagger-docs")
-      .swagger(new SwaggerOptions("/swagger").title("My Documentation"));
+      .ignorePath("/")
+      .ignorePath("/status/*")
+      .swagger(new SwaggerOptions("/swagger").title("API"));
   }
 
 }
