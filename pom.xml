@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.github.raffaeleragni</groupId>
+  <groupId>com.github.raffaeleragni.apilab</groupId>
   <artifactId>apilab</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <properties>
-    
+
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>13</maven.compiler.source>
     <maven.compiler.target>13</maven.compiler.target>
-    
+
     <version.logback>6.2</version.logback>
     <version.immutables>2.8.1</version.immutables>
     <version.dagger>2.24</version.dagger>
@@ -30,25 +30,25 @@
     <version.jdbi>3.12.0</version.jdbi>
     <version.liquibase>3.8.0</version.liquibase>
     <version.postgresclient>42.2.5</version.postgresclient>
-    
+
     <version.junit>5.6.0</version.junit>
     <version.mockito>3.2.4</version.mockito>
     <version.hamcrest>2.1</version.hamcrest>
     <version.jsonassert>1.5.0</version.jsonassert>
     <version.jacoco>0.8.5</version.jacoco>
-    
-    
+
+
     <!-- Sonar-JaCoCo properties -->
     <sonar.language>java</sonar.language>
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
     <sonar.jacoco.reportPath>${project.build.directory}/jacoco.exec</sonar.jacoco.reportPath>
-    
+
   </properties>
   <dependencies>
-    
+
     <!-- M A I N   D E P E N D E N C I E S -->
-    
+
     <!-- logging -->
     <dependency>
       <groupId>net.logstash.logback</groupId>
@@ -225,9 +225,9 @@
       <artifactId>postgresql</artifactId>
       <version>${version.postgresclient}</version>
     </dependency>
-    
+
     <!-- T E S T   D E P E N D E N C I E S -->
-    
+
     <!-- junit -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -261,10 +261,10 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
-    
+
       <!-- code coverage -->
       <plugin>
         <groupId>org.jacoco</groupId>
@@ -286,7 +286,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -318,8 +318,16 @@
           </includes>
         </configuration>
       </plugin>
-      
+
     </plugins>
   </build>
-  
+
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub OWNER Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/raffaeleragni/apilab</url>
+    </repository>
+  </distributionManagement>
+
 </project>

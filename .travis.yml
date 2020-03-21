@@ -19,4 +19,7 @@ jobs:
       script: ./mvnw clean test verify package
     - stage: deploy
       if: tag IS present
-      script: ./mvnw versions:set -DnewVersion=$TRAVIS_TAG clean test verify package deploy -Dregistry=https://maven.pkg.github.com/raffaeleragni -Dtoken=$GH_TOKEN
+      script:
+        - cp .mvn.settings.xml $HOME/.m2/settings.xml
+        - ./mvnw versions:set -DnewVersion=$TRAVIS_TAG
+        - ./mvnw clean test verify package deploy
