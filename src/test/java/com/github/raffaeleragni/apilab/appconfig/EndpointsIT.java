@@ -51,9 +51,10 @@ public class EndpointsIT {
   public static void prepare() throws Exception {
     client = new OkHttpClient();
     System.setProperty(API_JWT_SECRET.name(), "test");
-    app = Application.create(ImmutableApplicationInitializer.builder()
-      .roleMapper(Roles::valueOf)
-      .endpoints(Set.of(new Endpoint() {
+    app = DaggerApplicationComponent.builder()
+      .build()
+      .application();
+    app.endpoints = Set.of(new Endpoint() {
         @Override
         public void register(Javalin javalin) {
           javalin.get("/notfound", this);
@@ -73,8 +74,7 @@ public class EndpointsIT {
         public void handle(Context ctx) throws Exception {
           ctx.result("secured");
         }
-      }))
-      .build());
+      });
     app.start();
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Raffaele Ragni.
+ * Copyright 2020 Raffaele Ragni.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,26 +15,31 @@
  */
 package com.github.raffaeleragni.apilab.appconfig;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rabbitmq.client.ConnectionFactory;
-import dagger.Component;
-import io.javalin.Javalin;
-import io.lettuce.core.RedisClient;
-import javax.inject.Singleton;
-import org.jdbi.v3.core.Jdbi;
+import com.github.raffaeleragni.apilab.auth.Roles;
+import com.github.raffaeleragni.apilab.queues.QueueListener;
+import dagger.Provides;
+import static java.util.Collections.emptySet;
+import java.util.Set;
 
 /**
- * 
+ *
  * @author Raffaele Ragni
  */
-@Component(modules = {ApplicationConfig.class})
-@Singleton
-public interface ApplicationComponent {
-  Application application();
+@dagger.Module
+public class TestComponentProvider {
   
-  Javalin javalin();
-  ObjectMapper objectMapper();
-  Jdbi jdbi();
-  ConnectionFactory rabbit();
-  RedisClient redis();
+  @Provides
+  public ApplicationInitializer initializer() {
+    return ImmutableApplicationInitializer.builder().roleMapper(Roles::valueOf).build();
+  }
+  
+  @Provides
+  public Set<Endpoint> endpoints() {
+    return emptySet();
+  }
+  
+  @Provides
+  public Set<QueueListener> consumers() {
+    return emptySet();
+  }
 }

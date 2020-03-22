@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Raffaele Ragni.
+ * Copyright 2020 Raffaele Ragni.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,14 @@
  */
 package com.github.raffaeleragni.apilab.appconfig;
 
-import io.javalin.core.security.Role;
-import java.util.function.Function;
-import org.immutables.value.Value;
-import org.immutables.value.Value.Default;
+import javax.inject.Singleton;
 
 /**
- * 
+ *
  * @author Raffaele Ragni
  */
-@Value.Style(jdkOnly = true)
-@Value.Immutable
-public interface ApplicationInitializer {
-  @Default default Function<String, Role> roleMapper() { return s -> new Role(){}; }
+@Singleton
+@dagger.Component(modules = {ApplicationConfig.class, TestComponentProvider.class} )
+public interface ApplicationComponent {
+  Application application();
 }

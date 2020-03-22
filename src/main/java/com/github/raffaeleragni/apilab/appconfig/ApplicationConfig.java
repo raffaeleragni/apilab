@@ -37,11 +37,9 @@ import com.github.raffaeleragni.apilab.auth.JavalinJWTFilter;
 import com.github.raffaeleragni.apilab.exceptions.ApplicationException;
 import com.github.raffaeleragni.apilab.http2.JettyHttp2Creator;
 import com.github.raffaeleragni.apilab.metric.HealthCheckPlugin;
-import com.github.raffaeleragni.apilab.queues.QueueListener;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import dagger.Provides;
-import dagger.multibindings.ElementsIntoSet;
 import io.javalin.Javalin;
 import io.javalin.plugin.json.JavalinJackson;
 import io.javalin.plugin.openapi.OpenApiOptions;
@@ -53,7 +51,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import static java.util.Optional.ofNullable;
-import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import javax.inject.Named;
@@ -77,22 +74,13 @@ import org.slf4j.LoggerFactory;
 public class ApplicationConfig {
 
   private static final Logger LOG = LoggerFactory.getLogger(ApplicationConfig.class);
-  
-  private final ApplicationInitializer initializer;
-
-  public ApplicationConfig() {
-    this.initializer = ImmutableApplicationInitializer.builder().build();
-  }
-  
-  public ApplicationConfig(ApplicationInitializer initializer) {
-    this.initializer = initializer;
-  }
 
   // Main web server
 
   @Provides @Singleton
   public Javalin javalin(
       Env env,
+      ApplicationInitializer initializer,
       ObjectMapper objectMapper,
       @Named("healthcheck") Supplier<Map<String, Boolean>> healthcheck) {
 
@@ -122,15 +110,7 @@ public class ApplicationConfig {
 
     return javalin;
   }
-  
-  public @Provides @ElementsIntoSet Set<Endpoint> endpoints() {
-    return initializer.endpoints();
-  }
-  
-  public @Provides @ElementsIntoSet Set<QueueListener> consumers() {
-    return initializer.consumers();
-  }
-  
+
   // Persistence
   
   @Provides @Singleton @Named("healthcheck")

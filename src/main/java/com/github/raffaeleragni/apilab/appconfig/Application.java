@@ -48,14 +48,6 @@ public class Application {
   public Application() {
     // Injection constructor
   }
-  
-  public static Application create(ApplicationInitializer initializer) {
-    return DaggerApplicationComponent
-      .builder()
-      .applicationConfig(new ApplicationConfig(initializer))
-      .build()
-      .application();
-  }
 
   public void start() throws IOException {
 
