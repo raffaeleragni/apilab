@@ -58,6 +58,7 @@ public class ApplicationConfigTest {
     when(env.get(Env.Vars.API_ENABLE_ENDPOINTS)).thenReturn("false");
     
     config.javalin(env,
+      Set.of(endpoint),
       config.objectMapper(),
       () -> Map.of("db", true));
     
@@ -75,6 +76,7 @@ public class ApplicationConfigTest {
     when(env.get(Env.Vars.API_ENABLE_ENDPOINTS)).thenReturn("true");
     
     config.javalin(env,
+      Set.of(endpoint),
       config.objectMapper(),
       () -> Map.of("db", true));
     

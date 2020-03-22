@@ -96,6 +96,7 @@ public class ApplicationConfig {
   @Provides @Singleton
   public Javalin javalin(
       Env env,
+      Set<Endpoint> endpoints,
       ObjectMapper objectMapper,
       @Named("healthcheck") Supplier<Map<String, Boolean>> healthcheck) {
 
@@ -126,7 +127,7 @@ public class ApplicationConfig {
         .orElse(true);
     if (enabledEndpoints) {
       LOG.info("## ENDPOINTS ENABLED");
-      initializer.endpoints().stream().forEach(e -> {
+      endpoints.stream().forEach(e -> {
         LOG.info("## ENDPOINTS Registering {}", e.getClass().getName());
         e.register(javalin);
       });
@@ -135,6 +136,10 @@ public class ApplicationConfig {
     javalin.get("/", c -> c.redirect("/swagger"));
 
     return javalin;
+  }
+  
+  public @Provides @ElementsIntoSet Set<Endpoint> endpoints() {
+    return initializer.endpoints();
   }
   
   public @Provides @ElementsIntoSet Set<QueueListener> consumers() {
