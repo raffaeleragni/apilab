@@ -19,10 +19,10 @@ import com.auth0.jwt.algorithms.Algorithm;
 import static com.github.raffaeleragni.apilab.auth.Roles.ADMIN;
 import java.util.Map;
 import java.util.Set;
-import org.junit.jupiter.api.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
 /**
  *

@@ -16,6 +16,7 @@
 package com.github.raffaeleragni.apilab.appconfig;
 
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_CONSUMERS;
+import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_ENDPOINTS;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_MIGRATION;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_QUIT_AFTER_MIGRATION;
 import com.github.raffaeleragni.apilab.http2.JettyHttp2Creator;
@@ -40,7 +41,8 @@ public class Application {
   @Inject Javalin javalin;
   @Inject Env env;
   @Inject ConnectionFactory rabbitConnectionFactory;
-  @Inject Set<QueueListener> listeners;
+  @Inject Set<Endpoint> endpoints;
+  @Inject Set<QueueListener> consumers;
   
   @Inject
   public Application() {
@@ -59,6 +61,9 @@ public class Application {
 
     java.security.Security.setProperty("networkaddress.cache.ttl" , "60");
     
+    boolean enabledEndpoints = Optional.ofNullable(env.get(API_ENABLE_ENDPOINTS))
+        .map(Boolean::valueOf)
+        .orElse(true);
     boolean enableMigrations = Optional.ofNullable(env.get(API_ENABLE_MIGRATION))
         .map(Boolean::valueOf)
         .orElse(false);
@@ -73,8 +78,20 @@ public class Application {
       return;
     }
     
+    if (enabledEndpoints) {
+      LOG.info("## ENDPOINTS ENABLED");
+      endpoints.stream().forEach(e -> {
+        LOG.info("## ENDPOINTS Registering {}", e.getClass().getName());
+        e.register(javalin);
+      });
+    }
+    
     if (enableConsumers) {
-      listeners.stream().forEach(l -> l.registerQueueListener(rabbitConnectionFactory));
+      LOG.info("## CONSUMERS ENABLED");
+      consumers.stream().forEach(l -> {
+        LOG.info("## CONSUMERS Registering {}", l.getClass().getName());
+        l.registerQueueListener(rabbitConnectionFactory);
+      });
     }
     
     javalin.start();
@@ -90,7 +107,7 @@ public class Application {
       .map(Boolean::valueOf)
       .orElse(false);
     if (enableConsumers) {
-      listeners.stream().forEach(l -> l.unregisterQueueListener(rabbitConnectionFactory));
+      consumers.stream().forEach(l -> l.unregisterQueueListener(rabbitConnectionFactory));
     }
     javalin.stop();
     JettyHttp2Creator.stopMetrics();

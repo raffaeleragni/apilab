@@ -16,9 +16,8 @@
 package com.github.raffaeleragni.apilab.appconfig;
 
 import com.github.raffaeleragni.apilab.exceptions.ApplicationException;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
 /**
  * 

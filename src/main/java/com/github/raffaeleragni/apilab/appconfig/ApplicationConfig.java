@@ -24,7 +24,6 @@ import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_DATABASE_MA
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_DATABASE_PASSWORD;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_DATABASE_URL;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_DATABASE_USERNAME;
-import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_ENDPOINTS;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_MIGRATION;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_JWT_SECRET;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_RABBITMQ_HOST;
@@ -32,14 +31,17 @@ import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_RABBITMQ_PA
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_RABBITMQ_PORT;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_RABBITMQ_USERNAME;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_REDIS_URL;
+import com.github.raffaeleragni.apilab.auth.ImmutableConfiguration;
 import com.github.raffaeleragni.apilab.auth.JavalinJWTAccessManager;
 import com.github.raffaeleragni.apilab.auth.JavalinJWTFilter;
 import com.github.raffaeleragni.apilab.exceptions.ApplicationException;
 import com.github.raffaeleragni.apilab.http2.JettyHttp2Creator;
 import com.github.raffaeleragni.apilab.metric.HealthCheckPlugin;
+import com.github.raffaeleragni.apilab.queues.QueueListener;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import dagger.Provides;
+import dagger.multibindings.ElementsIntoSet;
 import io.javalin.Javalin;
 import io.javalin.plugin.json.JavalinJackson;
 import io.javalin.plugin.openapi.OpenApiOptions;
@@ -50,9 +52,8 @@ import io.swagger.v3.oas.models.info.Info;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-
 import static java.util.Optional.ofNullable;
-
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import javax.inject.Named;
@@ -67,10 +68,6 @@ import liquibase.resource.FileSystemResourceAccessor;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.github.raffaeleragni.apilab.auth.ImmutableConfiguration;
-import com.github.raffaeleragni.apilab.queues.QueueListener;
-import dagger.multibindings.ElementsIntoSet;
-import java.util.Set;
 
 /**
  * 
@@ -96,7 +93,6 @@ public class ApplicationConfig {
   @Provides @Singleton
   public Javalin javalin(
       Env env,
-      Set<Endpoint> endpoints,
       ObjectMapper objectMapper,
       @Named("healthcheck") Supplier<Map<String, Boolean>> healthcheck) {
 
@@ -121,17 +117,6 @@ public class ApplicationConfig {
       ctx.status(ex.getHttpCode());
       ctx.json(ex.getMessage());
     });
-    
-    boolean enabledEndpoints = Optional.ofNullable(env.get(API_ENABLE_ENDPOINTS))
-        .map(Boolean::valueOf)
-        .orElse(true);
-    if (enabledEndpoints) {
-      LOG.info("## ENDPOINTS ENABLED");
-      endpoints.stream().forEach(e -> {
-        LOG.info("## ENDPOINTS Registering {}", e.getClass().getName());
-        e.register(javalin);
-      });
-    }
 
     javalin.get("/", c -> c.redirect("/swagger"));
 

@@ -15,9 +15,9 @@
  */
 package com.github.raffaeleragni.apilab.auth;
 
+import static com.github.raffaeleragni.apilab.auth.JavalinJWTFilter.REQ_ATTR_ROLES;
 import static com.github.raffaeleragni.apilab.auth.Roles.ADMIN;
 import static com.github.raffaeleragni.apilab.auth.Roles.USER;
-import static com.github.raffaeleragni.apilab.auth.JavalinJWTFilter.REQ_ATTR_ROLES;
 import io.javalin.http.Handler;
 import io.javalin.http.util.ContextUtil;
 import static java.util.Collections.emptySet;

@@ -17,18 +17,12 @@ package com.github.raffaeleragni.apilab.appconfig;
 
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import io.javalin.core.security.Role;
-import java.util.Map;
-import java.util.Set;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -45,42 +39,6 @@ public class ApplicationConfigTest {
     
     config.runMigrations(env, "", "", "");
     assertThat("nothing to assert for this case?", config, not(nullValue()));
-  }
-  
-  @Test
-  public void testNoJavalinStartup() {
-    var endpoint = mock(Endpoint.class);
-    var config = new ApplicationConfig(ImmutableApplicationInitializer.builder()
-        .roleMapper(s -> new Role(){})
-        .endpoints(Set.of(endpoint))
-        .build());
-    var env = mock(Env.class);
-    when(env.get(Env.Vars.API_ENABLE_ENDPOINTS)).thenReturn("false");
-    
-    config.javalin(env,
-      Set.of(endpoint),
-      config.objectMapper(),
-      () -> Map.of("db", true));
-    
-    verify(endpoint, times(0)).register(any());
-  }
-  
-  @Test
-  public void testJavalinStartup() {
-    var endpoint = mock(Endpoint.class);
-    var config = new ApplicationConfig(ImmutableApplicationInitializer.builder()
-        .roleMapper(s -> new Role(){})
-        .endpoints(Set.of(endpoint))
-        .build());
-    var env = mock(Env.class);
-    when(env.get(Env.Vars.API_ENABLE_ENDPOINTS)).thenReturn("true");
-    
-    config.javalin(env,
-      Set.of(endpoint),
-      config.objectMapper(),
-      () -> Map.of("db", true));
-    
-    verify(endpoint).register(any());
   }
   
   @Test

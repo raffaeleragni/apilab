@@ -19,7 +19,6 @@ import io.javalin.Javalin;
 import io.javalin.http.Context;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;

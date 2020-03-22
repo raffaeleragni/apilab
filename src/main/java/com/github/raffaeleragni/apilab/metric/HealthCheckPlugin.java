@@ -21,9 +21,8 @@ import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Supplier;
-
 import static java.util.Optional.ofNullable;
+import java.util.function.Supplier;
 
 /**
  * Plugin that adds health check from information coming from the configured lambda on constructor.

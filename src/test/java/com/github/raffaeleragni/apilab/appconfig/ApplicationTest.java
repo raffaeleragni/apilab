@@ -16,11 +16,17 @@
 package com.github.raffaeleragni.apilab.appconfig;
 
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_CONSUMERS;
+import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_ENDPOINTS;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_MIGRATION;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_QUIT_AFTER_MIGRATION;
+import com.github.raffaeleragni.apilab.queues.QueueListener;
+import com.rabbitmq.client.ConnectionFactory;
 import io.javalin.Javalin;
 import java.io.IOException;
+import static java.util.Collections.emptySet;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -33,10 +39,48 @@ import static org.mockito.Mockito.when;
 public class ApplicationTest {
   
   @Test
-  public void testMigrationQuit() throws IOException {
+  public void testEnableDisable() throws IOException {
+    var app = new Application();
+    var endpoint = mock(Endpoint.class);
+    var consumer = mock(QueueListener.class);
+    app.javalin = mock(Javalin.class);
+    app.env = mock(Env.class);
+    app.rabbitConnectionFactory = mock(ConnectionFactory.class);
+    app.endpoints = Set.of(endpoint);
+    app.consumers = Set.of(consumer);
+    
+    // Test endpoints
+    
+    when(app.env.get(API_ENABLE_ENDPOINTS)).thenReturn("false");
+    app.start();
+    verify(endpoint, times(0)).register(any());
+    
+    when(app.env.get(API_ENABLE_ENDPOINTS)).thenReturn("true");
+    app.start();
+    verify(endpoint).register(app.javalin);
+    
+    // Test consumers
+    
+    when(app.env.get(API_ENABLE_CONSUMERS)).thenReturn("false");
+    app.start();
+    app.stop();
+    verify(consumer, times(0)).registerQueueListener(any());
+    
+    when(app.env.get(API_ENABLE_CONSUMERS)).thenReturn("true");
+    app.start();
+    app.stop();
+    verify(consumer).registerQueueListener(app.rabbitConnectionFactory);
+  }
+  
+  @Test
+  public void testMigrations() throws IOException {
     var app = new Application();
     app.javalin = mock(Javalin.class);
     app.env = mock(Env.class);
+    app.endpoints = emptySet();
+    app.consumers = emptySet();
+    
+    // Test the migrations
     
     when(app.env.get(API_ENABLE_MIGRATION)).thenReturn("true");
     when(app.env.get(API_QUIT_AFTER_MIGRATION)).thenReturn("true");
@@ -62,10 +106,6 @@ public class ApplicationTest {
     
     verify(app.javalin, times(3)).start();
     
-    when(app.env.get(API_ENABLE_CONSUMERS)).thenReturn("false");
-    app.stop();
-    
-    verify(app.javalin).stop();
   }
   
 }
