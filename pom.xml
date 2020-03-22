@@ -91,6 +91,11 @@
       <artifactId>java-jwt</artifactId>
       <version>${version.jwt}</version>
     </dependency>
+    <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.9</version>
+    </dependency>
     <!-- these are required to handle http/2 -->
     <dependency>
       <groupId>org.eclipse.jetty.http2</groupId>
