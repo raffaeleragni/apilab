@@ -19,7 +19,7 @@ import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_CONS
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_ENDPOINTS;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_MIGRATION;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_QUIT_AFTER_MIGRATION;
-import com.github.raffaeleragni.apilab.queues.QueueListener;
+import com.github.raffaeleragni.apilab.queues.QueueService;
 import com.rabbitmq.client.ConnectionFactory;
 import io.javalin.Javalin;
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class ApplicationTest {
   public void testEnableDisable() throws IOException {
     var app = new Application();
     var endpoint = mock(Endpoint.class);
-    var consumer = mock(QueueListener.class);
+    var consumer = mock(QueueService.class);
     app.javalin = mock(Javalin.class);
     app.env = mock(Env.class);
     app.rabbitConnectionFactory = mock(ConnectionFactory.class);
@@ -64,12 +64,12 @@ public class ApplicationTest {
     when(app.env.get(API_ENABLE_CONSUMERS)).thenReturn("false");
     app.start();
     app.stop();
-    verify(consumer, times(0)).registerQueueListener(any());
+    verify(consumer, times(0)).registerQueueListener();
     
     when(app.env.get(API_ENABLE_CONSUMERS)).thenReturn("true");
     app.start();
     app.stop();
-    verify(consumer).registerQueueListener(app.rabbitConnectionFactory);
+    verify(consumer).registerQueueListener();
   }
   
   @Test

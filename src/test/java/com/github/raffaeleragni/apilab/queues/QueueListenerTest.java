@@ -15,16 +15,21 @@
  */
 package com.github.raffaeleragni.apilab.queues;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.raffaeleragni.apilab.exceptions.ApplicationException;
+import com.rabbitmq.client.CancelCallback;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.DeliverCallback;
 import com.rabbitmq.client.Delivery;
+import com.rabbitmq.client.Envelope;
 import java.io.IOException;
-import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,84 +42,86 @@ public class QueueListenerTest {
    
   @Test
   public void testQueueing() throws IOException, TimeoutException {
-    
-    var listenerExceptional = new MyListenerExceptional();
-    // This should throw no exception
-    listenerExceptional.handle("tag", mock(Delivery.class));
-    
-    var listener = new MyListener();
+
+    var mapper = mock(ObjectMapper.class);
     var rabbitFactory = mock(ConnectionFactory.class);
     var rabbitConnection = mock(Connection.class);
     var rabbitChannel = mock(Channel.class);
+    var message = mock(Delivery.class);
+    when(message.getEnvelope()).thenReturn(mock(Envelope.class));
     
     when(rabbitFactory.newConnection()).thenReturn(rabbitConnection);
     when(rabbitConnection.createChannel()).thenReturn(rabbitChannel);
     
-    listener.handle("tag", mock(Delivery.class));
+    var listenerExceptional = new MyListenerExceptional(rabbitFactory, mapper);
     
-    listener.withinChannel(rabbitFactory, ch -> {});
+    var listener = new MyListener(rabbitFactory, mapper);
     
-    listener.registerQueueListener(rabbitFactory);
+    when(rabbitChannel.basicConsume(any(), anyBoolean(), any(DeliverCallback.class), any(CancelCallback.class)))
+      .thenAnswer(invok -> {
+        invok.getArgument(2, DeliverCallback.class).handle("tag", message);
+        return "tag";
+      });
     
-    listener.unregisterQueueListener(rabbitFactory);
+    listener.send("message");
+    listener.receive("message");
+    
+    listener.registerQueueListener();
+    
+    listener.unregisterQueueListener();
+    
+    listenerExceptional.registerQueueListener();
+    
+    doThrow(IOException.class).when(rabbitChannel)
+      .queueDeclare(any(), anyBoolean(), anyBoolean(), anyBoolean(), any());
+    assertThrows(ApplicationException.class, () ->{
+      listener.send("message");
+    });
+    
+    doThrow(IOException.class).when(rabbitConnection).createChannel();
+    assertThrows(ApplicationException.class, () ->{
+      listener.send("message");
+    });
     
     doThrow(IOException.class).when(rabbitFactory).newConnection();
-    
     assertThrows(ApplicationException.class, () ->{
-      listener.registerQueueListener(rabbitFactory);
+      listener.send("message");
     });
     
     assertThrows(ApplicationException.class, () ->{
-      listener.withinChannel(rabbitFactory, ch -> {});
+      listener.registerQueueListener();
+    });
+    assertThrows(ApplicationException.class, () ->{
+      listener.send("message");
+    });
+    assertThrows(ApplicationException.class, () ->{
+      listenerExceptional.registerQueueListener();
     });
     
+    
+    
   }
   
-  static class MyListener implements QueueListener {
+  static class MyListener extends QueueService<String> {
 
-    Optional<Runnable> callback;
+    public MyListener(ConnectionFactory rabbitFactory, ObjectMapper mapper) {
+      super(rabbitFactory, mapper, "my-queue-example-test", String.class);
+    }
+
+    @Override
+    public void receive(String message) {
+    }
     
-    @Override
-    public void setDeregisterCallback(Optional<Runnable> callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public Optional<Runnable> getDeregisterCallback() {
-      return callback;
-    }
-
-    @Override
-    public String getQueueName() {
-      return "testqueue";
-    }
-
-    @Override
-    public void receive(Delivery message) {
-    }
   }
   
-  static class MyListenerExceptional implements QueueListener {
+  static class MyListenerExceptional extends QueueService<String> {
 
-    Optional<Runnable> callback;
-    
-    @Override
-    public void setDeregisterCallback(Optional<Runnable> callback) {
-      this.callback = callback;
+    public MyListenerExceptional(ConnectionFactory rabbitFactory, ObjectMapper mapper) {
+      super(rabbitFactory, mapper, "my-exceptional-queue-example-test", String.class);
     }
 
     @Override
-    public Optional<Runnable> getDeregisterCallback() {
-      return callback;
-    }
-
-    @Override
-    public String getQueueName() {
-      return "testqueue";
-    }
-
-    @Override
-    public void receive(Delivery message) {
+    public void receive(String message) {
       throw new IllegalStateException();
     }
   }

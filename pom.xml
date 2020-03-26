@@ -302,6 +302,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.22.2</version>
         <configuration>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <environmentVariables>
             <API_ENABLE_ENDPOINTS>true</API_ENABLE_ENDPOINTS>
             <API_ENABLE_CONSUMERS>true</API_ENABLE_CONSUMERS>

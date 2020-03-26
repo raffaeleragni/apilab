@@ -16,7 +16,7 @@
 package com.github.raffaeleragni.apilab.appconfig;
 
 import com.github.raffaeleragni.apilab.auth.Roles;
-import com.github.raffaeleragni.apilab.queues.QueueListener;
+import com.github.raffaeleragni.apilab.queues.QueueService;
 import dagger.Provides;
 import static java.util.Collections.emptySet;
 import java.util.Set;
@@ -39,7 +39,7 @@ public class TestComponentProvider {
   }
   
   @Provides
-  public Set<QueueListener> consumers() {
+  public Set<QueueService> consumers() {
     return emptySet();
   }
 }

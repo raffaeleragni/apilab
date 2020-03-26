@@ -20,7 +20,7 @@ import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_ENDP
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_MIGRATION;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_QUIT_AFTER_MIGRATION;
 import com.github.raffaeleragni.apilab.http2.JettyHttp2Creator;
-import com.github.raffaeleragni.apilab.queues.QueueListener;
+import com.github.raffaeleragni.apilab.queues.QueueService;
 import com.rabbitmq.client.ConnectionFactory;
 import io.javalin.Javalin;
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class Application {
   @Inject Env env;
   @Inject ConnectionFactory rabbitConnectionFactory;
   @Inject Set<Endpoint> endpoints;
-  @Inject Set<QueueListener> consumers;
+  @Inject Set<QueueService> consumers;
   
   @Inject
   public Application() {
@@ -82,7 +82,7 @@ public class Application {
       LOG.info("## CONSUMERS ENABLED");
       consumers.stream().forEach(l -> {
         LOG.info("## CONSUMERS Registering {}", l.getClass().getName());
-        l.registerQueueListener(rabbitConnectionFactory);
+        l.registerQueueListener();
       });
     }
     
@@ -99,7 +99,7 @@ public class Application {
       .map(Boolean::valueOf)
       .orElse(false);
     if (enableConsumers) {
-      consumers.stream().forEach(l -> l.unregisterQueueListener(rabbitConnectionFactory));
+      consumers.stream().forEach(QueueService::unregisterQueueListener);
     }
     javalin.stop();
     JettyHttp2Creator.stopMetrics();
