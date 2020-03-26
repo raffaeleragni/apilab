@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -71,6 +72,10 @@ public class QueueListenerTest {
     listener.unregisterQueueListener();
     
     listenerExceptional.registerQueueListener();
+    
+    doThrow(IOException.class).when(rabbitChannel)
+      .basicAck(anyLong(), anyBoolean());
+    listener.registerQueueListener();
     
     doThrow(IOException.class).when(rabbitChannel)
       .queueDeclare(any(), anyBoolean(), anyBoolean(), anyBoolean(), any());
