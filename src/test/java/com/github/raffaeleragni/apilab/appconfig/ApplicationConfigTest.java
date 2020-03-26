@@ -17,6 +17,7 @@ package com.github.raffaeleragni.apilab.appconfig;
 
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import io.javalin.core.security.Role;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -50,6 +51,13 @@ public class ApplicationConfigTest {
     
     var result = ApplicationConfig.checkRabbit(factory);
     assertThat("failed health check", result, is(false));
+  }
+  
+  @Test void testInitializer() {
+    var mapper = ImmutableApplicationInitializer.builder().build().roleMapper();
+    var role = mapper.apply("test");
+    var result = role.toString();
+    assertThat("default role mapper is a class whose toString returns the param", result, is("test"));
   }
   
 }

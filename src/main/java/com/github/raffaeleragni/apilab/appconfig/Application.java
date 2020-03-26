@@ -18,6 +18,7 @@ package com.github.raffaeleragni.apilab.appconfig;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_CONSUMERS;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_ENDPOINTS;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_MIGRATION;
+import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_ENABLE_SCHEDULED;
 import static com.github.raffaeleragni.apilab.appconfig.Env.Vars.API_QUIT_AFTER_MIGRATION;
 import com.github.raffaeleragni.apilab.http2.JettyHttp2Creator;
 import com.github.raffaeleragni.apilab.queues.QueueService;
@@ -43,6 +44,7 @@ public class Application {
   @Inject ConnectionFactory rabbitConnectionFactory;
   @Inject Set<Endpoint> endpoints;
   @Inject Set<QueueService> consumers;
+  @Inject ApplicationScheduler appClock;
   
   @Inject
   public Application() {
@@ -63,6 +65,9 @@ public class Application {
       .map(Boolean::valueOf)
       .orElse(false);
     boolean enableConsumers = Optional.ofNullable(env.get(API_ENABLE_CONSUMERS))
+      .map(Boolean::valueOf)
+      .orElse(false);
+    boolean enableClock = Optional.ofNullable(env.get(API_ENABLE_SCHEDULED))
       .map(Boolean::valueOf)
       .orElse(false);
 
@@ -86,6 +91,10 @@ public class Application {
       });
     }
     
+    if (enableClock) {
+      appClock.start();
+    }
+    
     javalin.start();
     JettyHttp2Creator.startMetrics(env);
 
@@ -98,9 +107,18 @@ public class Application {
     boolean enableConsumers = Optional.ofNullable(env.get(API_ENABLE_CONSUMERS))
       .map(Boolean::valueOf)
       .orElse(false);
+    boolean enableClock = Optional.ofNullable(env.get(API_ENABLE_SCHEDULED))
+      .map(Boolean::valueOf)
+      .orElse(false);
+    
     if (enableConsumers) {
       consumers.stream().forEach(QueueService::unregisterQueueListener);
     }
+    
+    if (enableClock) {
+      appClock.stop();
+    }
+    
     javalin.stop();
     JettyHttp2Creator.stopMetrics();
   }

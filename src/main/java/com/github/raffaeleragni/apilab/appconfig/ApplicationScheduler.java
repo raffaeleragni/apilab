@@ -15,38 +15,39 @@
  */
 package com.github.raffaeleragni.apilab.appconfig;
 
-import com.github.raffaeleragni.apilab.auth.Roles;
-import com.github.raffaeleragni.apilab.queues.QueueService;
 import com.github.raffaeleragni.apilab.scheduled.Scheduled;
-import dagger.Provides;
-import java.time.Clock;
-import static java.util.Collections.emptySet;
+import it.sauronsoftware.cron4j.Scheduler;
+import java.util.Optional;
+import static java.util.Optional.empty;
 import java.util.Set;
+import javax.inject.Inject;
 
 /**
- *
  * @author Raffaele Ragni
  */
-@dagger.Module
-public class TestComponentProvider {
+public class ApplicationScheduler {
 
-  @Provides
-  public ApplicationInitializer initializer() {
-    return ImmutableApplicationInitializer.builder().roleMapper(Roles::valueOf).build();
+  Optional<Scheduler> scheduler = empty();
+  @Inject Set<Scheduled> scheduled;
+
+  @Inject
+  public ApplicationScheduler() {
+    // Constructor injector
   }
   
-  @Provides
-  public Set<Endpoint> endpoints() {
-    return emptySet();
+  public void start() {
+    // start is also a restart, so stop before in any case.
+    stop();
+    scheduler = Optional.of(new Scheduler());
+    scheduler.ifPresent(s -> {
+      scheduled.stream().forEach(task -> s.schedule(task.cron(), task));
+      s.start();
+    });
   }
   
-  @Provides
-  public Set<QueueService> consumers() {
-    return emptySet();
+  public void stop() {
+    scheduler.ifPresent(Scheduler::stop);
+    scheduler = empty();
   }
   
-  @Provides
-  public Set<Scheduled> scheduled() {
-    return emptySet();
-  }
 }

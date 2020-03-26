@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Raffaele Ragni.
+ * Copyright 2020 Raffaele Ragni.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.raffaeleragni.apilab.appconfig;
-
-import io.javalin.core.security.Role;
-import java.util.function.Function;
-import org.immutables.value.Value;
-import org.immutables.value.Value.Default;
+package com.github.raffaeleragni.apilab.scheduled;
 
 /**
- * 
+ *
  * @author Raffaele Ragni
  */
-@Value.Style(jdkOnly = true)
-@Value.Immutable
-public interface ApplicationInitializer {
-  @Default default Function<String, Role> roleMapper() { return s -> new Role(){
-    @Override
-    public String toString() {
-      return s;
-    }
-  }; }
+public interface Scheduled extends Runnable {
+  
+  /**
+   * @return The cron definition in cron format
+   */
+  String cron();
+
 }

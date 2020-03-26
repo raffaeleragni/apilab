@@ -36,6 +36,7 @@ import org.json.JSONException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.mock;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 /**
@@ -54,6 +55,7 @@ public class EndpointsIT {
     app = DaggerApplicationComponent.builder()
       .build()
       .application();
+    app.appClock = mock(ApplicationScheduler.class);
     app.endpoints = Set.of(new Endpoint() {
         @Override
         public void register(Javalin javalin) {

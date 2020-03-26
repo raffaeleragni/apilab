@@ -15,38 +15,46 @@
  */
 package com.github.raffaeleragni.apilab.appconfig;
 
-import com.github.raffaeleragni.apilab.auth.Roles;
-import com.github.raffaeleragni.apilab.queues.QueueService;
 import com.github.raffaeleragni.apilab.scheduled.Scheduled;
-import dagger.Provides;
-import java.time.Clock;
-import static java.util.Collections.emptySet;
 import java.util.Set;
+import org.junit.jupiter.api.Test;
 
 /**
  *
  * @author Raffaele Ragni
  */
-@dagger.Module
-public class TestComponentProvider {
+public class ApplicationSchedulerTest {
+  @Test
+  public void testScheduler() {
+    var scheduler = new ApplicationScheduler();
+    
+    scheduler.scheduled = Set.of(new MyScheduled());
+    
+    scheduler.stop();
+    
+    scheduler.start();
+    scheduler.stop();
+    
+    scheduler.stop();
+    
+    scheduler.start();
+    scheduler.start();
+    
+    scheduler.stop();
+    
+  } 
+}
 
-  @Provides
-  public ApplicationInitializer initializer() {
-    return ImmutableApplicationInitializer.builder().roleMapper(Roles::valueOf).build();
+class MyScheduled implements Scheduled {
+
+  @Override
+  public String cron() {
+    return "* * * * *";
+  }
+
+  @Override
+  public void run() {
+    System.out.println("test");
   }
   
-  @Provides
-  public Set<Endpoint> endpoints() {
-    return emptySet();
-  }
-  
-  @Provides
-  public Set<QueueService> consumers() {
-    return emptySet();
-  }
-  
-  @Provides
-  public Set<Scheduled> scheduled() {
-    return emptySet();
-  }
 }
