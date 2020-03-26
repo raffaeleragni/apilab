@@ -65,14 +65,8 @@ public abstract class QueueService<T> {
       var tag = channel.basicConsume(queueName, false, (t, d) -> {
         try {
           receive(mapper.readValue(d.getBody(), clazz));
-          withinChannel(rabbitFactory, c -> {
-            try {
-              c.basicAck(d.getEnvelope().getDeliveryTag(), false);
-            } catch (IOException ex) {
-              LoggerFactory.getLogger(this.getClass()).error(ex.getMessage(), ex);
-            }
-          });
-        } catch (RuntimeException ex) {
+          channel.basicAck(d.getEnvelope().getDeliveryTag(), false); 
+        } catch (IOException | RuntimeException ex) {
           // Must swallow all exceptions or the queue consumer will die otherwise.
           // Still the ack was not done so the message gets retried.
           // TODO implement a max retry?
