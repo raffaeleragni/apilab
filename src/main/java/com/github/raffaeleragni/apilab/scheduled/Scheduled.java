@@ -20,10 +20,10 @@ package com.github.raffaeleragni.apilab.scheduled;
  * @author Raffaele Ragni
  */
 public interface Scheduled extends Runnable {
-  
+
   /**
-   * @return The cron definition in cron format
+   * @return The period in milliseconds
    */
-  String cron();
+  long period();
 
 }

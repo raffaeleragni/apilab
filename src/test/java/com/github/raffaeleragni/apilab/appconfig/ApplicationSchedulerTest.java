@@ -17,6 +17,7 @@ package com.github.raffaeleragni.apilab.appconfig;
 
 import com.github.raffaeleragni.apilab.scheduled.Scheduled;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -25,10 +26,10 @@ import org.junit.jupiter.api.Test;
  */
 public class ApplicationSchedulerTest {
   @Test
-  public void testScheduler() {
+  public void testScheduler() throws InterruptedException {
     var scheduler = new ApplicationScheduler();
     
-    scheduler.scheduled = Set.of(new MyScheduled());
+    scheduler.scheduled = Set.of(new MyScheduled(), new MyScheduledExceptional());
     
     scheduler.stop();
     
@@ -39,6 +40,8 @@ public class ApplicationSchedulerTest {
     
     scheduler.start();
     scheduler.start();
+    
+    TimeUnit.MILLISECONDS.sleep(100L);
     
     scheduler.stop();
     
@@ -48,13 +51,27 @@ public class ApplicationSchedulerTest {
 class MyScheduled implements Scheduled {
 
   @Override
-  public String cron() {
-    return "* * * * *";
+  public void run() {
+    System.out.println("test");
   }
 
   @Override
+  public long period() {
+    return 10;
+  }
+  
+}
+
+class MyScheduledExceptional implements Scheduled {
+
+  @Override
   public void run() {
-    System.out.println("test");
+    throw new IllegalStateException();
+  }
+
+  @Override
+  public long period() {
+    return 10;
   }
   
 }

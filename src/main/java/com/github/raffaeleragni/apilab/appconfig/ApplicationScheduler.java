@@ -16,18 +16,24 @@
 package com.github.raffaeleragni.apilab.appconfig;
 
 import com.github.raffaeleragni.apilab.scheduled.Scheduled;
-import it.sauronsoftware.cron4j.Scheduler;
 import java.util.Optional;
 import static java.util.Optional.empty;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import javax.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Raffaele Ragni
  */
 public class ApplicationScheduler {
 
-  Optional<Scheduler> scheduler = empty();
+  private static final Logger LOG = LoggerFactory.getLogger(ApplicationScheduler.class);
+  
+  Optional<ScheduledExecutorService> scheduler = empty();
   @Inject Set<Scheduled> scheduled;
 
   @Inject
@@ -38,15 +44,22 @@ public class ApplicationScheduler {
   public void start() {
     // start is also a restart, so stop before in any case.
     stop();
-    scheduler = Optional.of(new Scheduler());
+    scheduler = Optional.of(Executors.newScheduledThreadPool(1));
     scheduler.ifPresent(s -> {
-      scheduled.stream().forEach(task -> s.schedule(task.cron(), task));
-      s.start();
+      scheduled.stream().forEach(task -> {
+        s.scheduleAtFixedRate(() -> {
+          try {
+          task.run();
+          } catch (RuntimeException ex) {
+            LOG.warn(ex.getMessage(), ex);
+          }
+        }, 0, task.period(), MILLISECONDS);
+      });
     });
   }
   
   public void stop() {
-    scheduler.ifPresent(Scheduler::stop);
+    scheduler.ifPresent(ScheduledExecutorService::shutdownNow);
     scheduler = empty();
   }
   
