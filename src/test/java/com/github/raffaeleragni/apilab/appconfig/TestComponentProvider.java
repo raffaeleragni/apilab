@@ -15,13 +15,14 @@
  */
 package com.github.raffaeleragni.apilab.appconfig;
 
+import com.github.raffaeleragni.apilab.appconfig.components.GetEndpointSample;
+import com.github.raffaeleragni.apilab.appconfig.components.MyEventServiceSample;
+import com.github.raffaeleragni.apilab.appconfig.components.MyScheduledSample;
 import com.github.raffaeleragni.apilab.auth.Roles;
 import com.github.raffaeleragni.apilab.queues.QueueService;
 import com.github.raffaeleragni.apilab.scheduled.Scheduled;
 import dagger.Provides;
-import java.time.Clock;
-import static java.util.Collections.emptySet;
-import java.util.Set;
+import dagger.multibindings.IntoSet;
 
 /**
  *
@@ -35,18 +36,18 @@ public class TestComponentProvider {
     return ImmutableApplicationInitializer.builder().roleMapper(Roles::valueOf).build();
   }
   
-  @Provides
-  public Set<Endpoint> endpoints() {
-    return emptySet();
+  @Provides @IntoSet
+  public Endpoint endpoint(GetEndpointSample o) {
+    return o;
   }
   
-  @Provides
-  public Set<QueueService> consumers() {
-    return emptySet();
+  @Provides @IntoSet
+  public QueueService consumers(MyEventServiceSample o) {
+    return o;
   }
   
-  @Provides
-  public Set<Scheduled> scheduled() {
-    return emptySet();
+  @Provides @IntoSet
+  public Scheduled scheduled(MyScheduledSample o) {
+    return o;
   }
 }

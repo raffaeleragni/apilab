@@ -5,6 +5,7 @@ import com.github.raffaeleragni.apilab.exceptions.ApplicationException;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConnectionFactory;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import static java.util.Optional.empty;
@@ -42,7 +43,7 @@ public abstract class QueueService<T> {
   public void send(T message) {
     withinChannel(rabbitFactory, ch -> {
       try {
-        ch.queueDeclare(queueName, true, false, false, null);
+        queueDeclare(ch);
         ch.basicPublish("", queueName, null, mapper.writeValueAsBytes(message));
         LOG.debug("Sent messsage: {}", message);
       } catch (IOException ex) {
@@ -61,7 +62,7 @@ public abstract class QueueService<T> {
     try {
       var connection = rabbitFactory.newConnection();
       var channel = connection.createChannel();
-      channel.queueDeclare(queueName, true, false, false, null);
+      queueDeclare(channel);
       var tag = channel.basicConsume(queueName, false, (t, d) -> {
         try {
           receive(mapper.readValue(d.getBody(), clazz));
@@ -91,6 +92,16 @@ public abstract class QueueService<T> {
       callback.run();
       deregisterCallback = empty();
     });
+  }
+  
+  private void queueDeclare(Channel ch) throws IOException {
+    // the dead letter queue is declared first
+    ch.queueDeclare(queueName+"_dlq", true, false, false, null);
+    // the actual queue is declared with routing erorr message to the dead letter queue
+    ch.queueDeclare(queueName, true, false, false, Map.of(
+      "x-dead-letter-exchange", "",
+      "x-dead-letter-routing-key", queueName+"_dlq"
+    ));
   }
 
   private static void withinChannel(ConnectionFactory rabbitFactory, Consumer<Channel> fn) {

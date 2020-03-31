@@ -45,17 +45,17 @@ public class ApplicationScheduler {
     // start is also a restart, so stop before in any case.
     stop();
     scheduler = Optional.of(Executors.newScheduledThreadPool(1));
-    scheduler.ifPresent(s -> {
-      scheduled.stream().forEach(task -> {
+    scheduler.ifPresent(s -> 
+      scheduled.stream().forEach(task -> 
         s.scheduleAtFixedRate(() -> {
           try {
-          task.run();
+            task.run();
           } catch (RuntimeException ex) {
             LOG.warn(ex.getMessage(), ex);
           }
-        }, 0, task.period(), MILLISECONDS);
-      });
-    });
+        }, 0, task.period(), MILLISECONDS)
+      )
+    );
   }
   
   public void stop() {
