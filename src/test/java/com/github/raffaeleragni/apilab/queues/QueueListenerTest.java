@@ -77,6 +77,10 @@ public class QueueListenerTest {
       .basicAck(anyLong(), anyBoolean());
     listener.registerQueueListener();
     
+    doThrow(RuntimeException.class).when(rabbitChannel)
+      .basicNack(anyLong(), anyBoolean(), anyBoolean());
+    listener.registerQueueListener();
+    
     doThrow(IOException.class).when(rabbitChannel)
       .queueDeclare(any(), anyBoolean(), anyBoolean(), anyBoolean(), any());
     assertThrows(ApplicationException.class, () ->{

@@ -66,11 +66,16 @@ public abstract class QueueService<T> {
       var tag = channel.basicConsume(queueName, false, (t, d) -> {
         try {
           receive(mapper.readValue(d.getBody(), clazz));
-          channel.basicAck(d.getEnvelope().getDeliveryTag(), false); 
+          channel.basicAck(d.getEnvelope().getDeliveryTag(), false);
         } catch (IOException | RuntimeException ex) {
           // Must swallow all exceptions or the queue consumer will die otherwise.
-          // Still the ack was not done so the message gets retried.
-          // TODO implement a max retry?
+          // Give an explicit NACK so the message ends up in the dead letter queue
+          // and it is not requeued. Retry behavior will kick in in the DLQ later.
+          try {
+            channel.basicNack(d.getEnvelope().getDeliveryTag(), false, false);
+          } catch (RuntimeException ex2) {
+            LoggerFactory.getLogger(this.getClass()).error(ex2.getMessage(), ex2);
+          }
           LoggerFactory.getLogger(this.getClass()).error(ex.getMessage(), ex);
         }
       }, t -> {});
