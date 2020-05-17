@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.github.raffaeleragni.apilab</groupId>
+    <artifactId>apilab</artifactId>
+    <version>2.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>apilab-jdbi</artifactId>
+  <packaging>jar</packaging>
+  <properties>
+    <version.apilab>${project.version}</version.apilab>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>com.github.raffaeleragni.apilab</groupId>
+      <artifactId>apilab-core</artifactId>
+      <version>${version.apilab}</version>
+    </dependency>
+    <!-- Database and pooler, and migration tool -->
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+      <version>${version.hikaricp}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jdbi</groupId>
+      <artifactId>jdbi3-core</artifactId>
+      <version>${version.jdbi}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+      <version>${version.liquibase}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${version.postgresclient}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.200</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
