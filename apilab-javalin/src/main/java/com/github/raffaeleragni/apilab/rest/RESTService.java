@@ -17,7 +17,9 @@ package com.github.raffaeleragni.apilab.rest;
 
 import com.github.raffaeleragni.apilab.core.ApplicationService;
 import com.github.raffaeleragni.apilab.core.Env;
+import static com.github.raffaeleragni.apilab.core.Env.Vars.API_QUIT_AFTER_MIGRATION;
 import io.javalin.Javalin;
+import java.util.Optional;
 import javax.inject.Inject;
 
 /**
@@ -36,14 +38,26 @@ public class RESTService implements ApplicationService {
 
   @Override
   public void start() {
+    if (ignore()) {
+      return;
+    }
     javalin.start();
     JettyHttp2Creator.startMetrics(env);
   }
 
   @Override
   public void stop() {
+    if (ignore()) {
+      return;
+    }
     javalin.stop();
     JettyHttp2Creator.stopMetrics();
+  }
+
+  private boolean ignore() {
+    return Optional.ofNullable(env.get(API_QUIT_AFTER_MIGRATION))
+       .map(Boolean::valueOf)
+       .orElse(false);
   }
 
 }

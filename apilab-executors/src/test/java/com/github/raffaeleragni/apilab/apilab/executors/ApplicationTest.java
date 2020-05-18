@@ -16,6 +16,7 @@
 package com.github.raffaeleragni.apilab.apilab.executors;
 
 import static com.github.raffaeleragni.apilab.core.Env.Vars.API_ENABLE_SCHEDULED;
+import static com.github.raffaeleragni.apilab.core.Env.Vars.API_QUIT_AFTER_MIGRATION;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,6 +33,10 @@ public class ApplicationTest {
 
     System.setProperty(API_ENABLE_SCHEDULED.name(), "true");
     instance = DaggerApplicationComponent.create().instance();
+    instance.start();
+    instance.stop();
+
+    System.setProperty(API_QUIT_AFTER_MIGRATION.name(), "true");
     instance.start();
     instance.stop();
   }

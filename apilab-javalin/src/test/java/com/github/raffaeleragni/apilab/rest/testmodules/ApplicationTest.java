@@ -15,6 +15,7 @@
  */
 package com.github.raffaeleragni.apilab.rest.testmodules;
 
+import static com.github.raffaeleragni.apilab.core.Env.Vars.API_QUIT_AFTER_MIGRATION;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -25,6 +26,10 @@ public class ApplicationTest {
   @Test
   public void testComponent() {
     var instance = DaggerApplicationComponent.create().instance();
+    instance.start();
+    instance.stop();
+
+    System.setProperty(API_QUIT_AFTER_MIGRATION.name(), "true");
     instance.start();
     instance.stop();
   }

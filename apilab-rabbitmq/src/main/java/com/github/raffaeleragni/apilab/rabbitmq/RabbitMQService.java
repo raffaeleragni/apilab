@@ -18,6 +18,7 @@ package com.github.raffaeleragni.apilab.rabbitmq;
 import com.github.raffaeleragni.apilab.core.ApplicationService;
 import com.github.raffaeleragni.apilab.core.Env;
 import static com.github.raffaeleragni.apilab.core.Env.Vars.API_ENABLE_CONSUMERS;
+import static com.github.raffaeleragni.apilab.core.Env.Vars.API_QUIT_AFTER_MIGRATION;
 import com.github.raffaeleragni.apilab.queues.QueueService;
 import com.rabbitmq.client.ConnectionFactory;
 import java.util.Optional;
@@ -45,7 +46,7 @@ public class RabbitMQService implements ApplicationService {
 
   @Override
   public void start() {
-    if (enabledConsumers()) {
+    if (!ignore() && enabledConsumers()) {
       LOG.info("## CONSUMERS ENABLED");
       queueServices.stream().forEach(l -> {
         LOG.info("## CONSUMERS Registering {}", l.getClass().getName());
@@ -56,7 +57,7 @@ public class RabbitMQService implements ApplicationService {
 
   @Override
   public void stop() {
-    if (enabledConsumers()) {
+    if (!ignore() && enabledConsumers()) {
       queueServices.stream().forEach(QueueService::unregisterQueueListener);
     }
   }
@@ -65,6 +66,12 @@ public class RabbitMQService implements ApplicationService {
     return Optional.ofNullable(env.get(API_ENABLE_CONSUMERS))
       .map(Boolean::valueOf)
       .orElse(false);
+  }
+
+  private boolean ignore() {
+    return Optional.ofNullable(env.get(API_QUIT_AFTER_MIGRATION))
+       .map(Boolean::valueOf)
+       .orElse(false);
   }
 
 }
