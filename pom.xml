@@ -78,6 +78,7 @@
           </annotationProcessorPaths>
         </configuration>
       </plugin>
+
       <!-- code coverage -->
       <plugin>
         <groupId>org.jacoco</groupId>

@@ -34,13 +34,14 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import com.github.raffaeleragni.apilab.queues.ImmutableQueueServiceOptions;
 
 /**
- * 
+ *
  * @author Raffaele Ragni
  */
 public class QueueListenerTest {
-   
+
   @Test
   public void testQueueing() throws IOException, TimeoutException {
 
@@ -50,53 +51,53 @@ public class QueueListenerTest {
     var rabbitChannel = mock(Channel.class);
     var message = mock(Delivery.class);
     when(message.getEnvelope()).thenReturn(mock(Envelope.class));
-    
+
     when(rabbitFactory.newConnection()).thenReturn(rabbitConnection);
     when(rabbitConnection.createChannel()).thenReturn(rabbitChannel);
-    
+
     var listenerExceptional = new MyListenerExceptional(rabbitFactory, mapper);
-    
+
     var listener = new MyListener(rabbitFactory, mapper);
-    
+
     when(rabbitChannel.basicConsume(any(), anyBoolean(), any(DeliverCallback.class), any(CancelCallback.class)))
       .thenAnswer(invok -> {
         invok.getArgument(2, DeliverCallback.class).handle("tag", message);
         return "tag";
       });
-    
+
     listener.send("message");
     listener.receive("message");
-    
+
     listener.registerQueueListener();
-    
+
     listener.unregisterQueueListener();
-    
+
     listenerExceptional.registerQueueListener();
-    
+
     doThrow(IOException.class).when(rabbitChannel)
       .basicAck(anyLong(), anyBoolean());
     listener.registerQueueListener();
-    
+
     doThrow(RuntimeException.class).when(rabbitChannel)
       .basicNack(anyLong(), anyBoolean(), anyBoolean());
     listener.registerQueueListener();
-    
+
     doThrow(IOException.class).when(rabbitChannel)
       .queueDeclare(any(), anyBoolean(), anyBoolean(), anyBoolean(), any());
     assertThrows(ApplicationException.class, () ->{
       listener.send("message");
     });
-    
+
     doThrow(IOException.class).when(rabbitConnection).createChannel();
     assertThrows(ApplicationException.class, () ->{
       listener.send("message");
     });
-    
+
     doThrow(IOException.class).when(rabbitFactory).newConnection();
     assertThrows(ApplicationException.class, () ->{
       listener.send("message");
     });
-    
+
     assertThrows(ApplicationException.class, () ->{
       listener.registerQueueListener();
     });
@@ -106,27 +107,27 @@ public class QueueListenerTest {
     assertThrows(ApplicationException.class, () ->{
       listenerExceptional.registerQueueListener();
     });
-    
-    
-    
+
+
+
   }
-  
+
   static class MyListener extends QueueService<String> {
 
     public MyListener(ConnectionFactory rabbitFactory, ObjectMapper mapper) {
-      super(rabbitFactory, mapper, "my-queue-example-test", String.class);
+      super(rabbitFactory, mapper, "my-queue-example-test", String.class, ImmutableQueueServiceOptions.builder().build());
     }
 
     @Override
     public void receive(String message) {
     }
-    
+
   }
-  
+
   static class MyListenerExceptional extends QueueService<String> {
 
     public MyListenerExceptional(ConnectionFactory rabbitFactory, ObjectMapper mapper) {
-      super(rabbitFactory, mapper, "my-exceptional-queue-example-test", String.class);
+      super(rabbitFactory, mapper, "my-exceptional-queue-example-test", String.class, ImmutableQueueServiceOptions.builder().build());
     }
 
     @Override

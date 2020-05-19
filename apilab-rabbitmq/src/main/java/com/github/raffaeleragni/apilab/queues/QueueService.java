@@ -43,6 +43,7 @@ public abstract class QueueService<T> {
   ObjectMapper mapper;
   String queueName;
   Class<T> clazz;
+  QueueServiceOptions options;
 
   public QueueService(
     ConnectionFactory rabbitFactory,
@@ -50,10 +51,26 @@ public abstract class QueueService<T> {
     String queueName,
     Class<T> clazz) {
 
+    this(
+      rabbitFactory,
+      mapper,
+      queueName,
+      clazz,
+      ImmutableQueueServiceOptions.builder().build());
+  }
+
+  public QueueService(
+    ConnectionFactory rabbitFactory,
+    ObjectMapper mapper,
+    String queueName,
+    Class<T> clazz,
+    QueueServiceOptions options) {
+
     this.rabbitFactory = Objects.requireNonNull(rabbitFactory);
     this.mapper = Objects.requireNonNull(mapper);
     this.queueName = Objects.requireNonNull(queueName);
     this.clazz = Objects.requireNonNull(clazz);
+    this.options = options;
   }
 
   public void send(T message) {
@@ -117,9 +134,9 @@ public abstract class QueueService<T> {
 
   private void queueDeclare(Channel ch) throws IOException {
     // the dead letter queue is declared first
-    ch.queueDeclare(queueName+"_dlq", true, false, false, null);
+    ch.queueDeclare(queueName+"_dlq", options.durable(), options.exclusive(), options.autoDelete(), null);
     // the actual queue is declared with routing erorr message to the dead letter queue
-    ch.queueDeclare(queueName, true, false, false, Map.of(
+    ch.queueDeclare(queueName, options.durable(), options.exclusive(), options.autoDelete(), Map.of(
       "x-dead-letter-exchange", "",
       "x-dead-letter-routing-key", queueName+"_dlq"
     ));
