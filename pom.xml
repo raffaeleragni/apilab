@@ -206,8 +206,8 @@
       <version>${version.jackson}</version>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-jaxb-annotations</artifactId>
+      <groupId>com.fasterxml.jackson.module</groupId>
+      <artifactId>jackson-module-jaxb-annotations</artifactId>
       <version>${version.jackson}</version>
     </dependency>
     <dependency>
