@@ -9,7 +9,13 @@
   <artifactId>apilab-javalin</artifactId>
   <packaging>jar</packaging>
   <properties>
+    <version.swagger-core>2.1.1</version.swagger-core>
+    <version.swagger-ui>3.24.3</version.swagger-ui>
     <version.apilab>${project.version}</version.apilab>
+    <!-- -->
+    <version.jetty>9.4.25.v20191220</version.jetty>
+    <version.alpn-api>1.1.3.v20160715</version.alpn-api>
+    <version.alpn-boot>8.1.13.v20181017</version.alpn-boot>
   </properties>
   <dependencies>
     <dependency>
@@ -20,7 +26,7 @@
     <dependency>
       <groupId>io.javalin</groupId>
       <artifactId>javalin</artifactId>
-      <version>${version.javalin}</version>
+      <version>3.8.0</version>
     </dependency>
     <!-- these are required to handle http/2 -->
     <dependency>
@@ -69,7 +75,7 @@
     <dependency>
       <groupId>com.auth0</groupId>
       <artifactId>java-jwt</artifactId>
-      <version>${version.jwt}</version>
+      <version>3.10.3</version>
     </dependency>
     <dependency>
         <groupId>commons-codec</groupId>

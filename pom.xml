@@ -17,39 +17,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>12</maven.compiler.source>
     <maven.compiler.target>12</maven.compiler.target>
-    <!-- -->
-    <version.slf4j>1.7.30</version.slf4j>
-    <version.logback>1.2.3</version.logback>
-    <version.logback.logstash>6.2</version.logback.logstash>
-    <version.immutables>2.8.1</version.immutables>
-    <version.dagger>2.24</version.dagger>
     <version.jackson>2.11.0</version.jackson>
-    <!-- -->
-    <version.jwt>3.10.1</version.jwt>
-    <version.javalin>3.8.0</version.javalin>
     <version.prometheusclient>0.9.0</version.prometheusclient>
-    <version.swagger-core>2.1.1</version.swagger-core>
-    <version.swagger-ui>3.24.3</version.swagger-ui>
-    <version.retrofit>2.6.2</version.retrofit>
-    <!-- -->
-    <version.lettuce>5.2.2.RELEASE</version.lettuce>
-    <!-- -->
-    <version.jetty>9.4.25.v20191220</version.jetty>
-    <version.alpn-api>1.1.3.v20160715</version.alpn-api>
-    <version.alpn-boot>8.1.13.v20181017</version.alpn-boot>
-    <!-- -->
-    <version.junit>5.6.0</version.junit>
-    <version.mockito>3.2.4</version.mockito>
-    <version.hamcrest>2.1</version.hamcrest>
-    <version.jsonassert>1.5.0</version.jsonassert>
-    <version.jacoco>0.8.5</version.jacoco>
-    <!-- -->
-    <version.hikaricp>2.3.2</version.hikaricp>
-    <version.jdbi>3.12.0</version.jdbi>
-    <version.liquibase>3.8.0</version.liquibase>
-    <version.postgresclient>42.2.5</version.postgresclient>
-    <!-- -->
-    <version.rabbitmq>5.8.0</version.rabbitmq>
     <!-- Sonar-JaCoCo properties -->
     <sonar.language>java</sonar.language>
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
@@ -68,12 +37,12 @@
             <path>
               <groupId>com.google.dagger</groupId>
               <artifactId>dagger-compiler</artifactId>
-              <version>${version.dagger}</version>
+              <version>2.27</version>
             </path>
             <path>
               <groupId>org.immutables</groupId>
               <artifactId>value</artifactId>
-              <version>${version.immutables}</version>
+              <version>2.8.8</version>
             </path>
           </annotationProcessorPaths>
         </configuration>
@@ -83,7 +52,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>${version.jacoco}</version>
+        <version>0.8.5</version>
         <inherited>true</inherited>
         <executions>
           <execution>
@@ -164,35 +133,35 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>${version.slf4j}</version>
+      <version>1.7.30</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>${version.logback}</version>
+      <version>1.2.3</version>
     </dependency>
     <dependency>
       <groupId>net.logstash.logback</groupId>
       <artifactId>logstash-logback-encoder</artifactId>
-      <version>${version.logback.logstash}</version>
+      <version>6.3</version>
     </dependency>
     <!-- immutable values -->
     <dependency>
       <groupId>org.immutables</groupId>
       <artifactId>value-annotations</artifactId>
-      <version>${version.immutables}</version>
+      <version>2.8.8</version>
     </dependency>
     <!-- retrofit client for calling other apis -->
     <dependency>
       <groupId>com.squareup.retrofit2</groupId>
       <artifactId>retrofit</artifactId>
-      <version>${version.retrofit}</version>
+      <version>2.8.1</version>
     </dependency>
     <!-- dagger2 dependency injection at compile time -->
     <dependency>
       <groupId>com.google.dagger</groupId>
       <artifactId>dagger</artifactId>
-      <version>${version.dagger}</version>
+      <version>2.27</version>
     </dependency>
     <!-- prometheus metrics -->
     <dependency>
@@ -237,32 +206,32 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <version>${version.junit}</version>
+      <version>5.6.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>${version.junit}</version>
+      <version>5.6.2</version>
       <scope>test</scope>
     </dependency>
     <!-- testing mockers, matchers and utilities -->
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>${version.mockito}</version>
+      <version>3.3.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-core</artifactId>
-      <version>${version.hamcrest}</version>
+      <version>2.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.skyscreamer</groupId>
       <artifactId>jsonassert</artifactId>
-      <version>${version.jsonassert}</version>
+      <version>1.5.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

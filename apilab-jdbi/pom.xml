@@ -21,23 +21,17 @@
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
-      <version>${version.hikaricp}</version>
+      <version>3.4.5</version>
     </dependency>
     <dependency>
       <groupId>org.jdbi</groupId>
       <artifactId>jdbi3-core</artifactId>
-      <version>${version.jdbi}</version>
+      <version>3.12.0</version>
     </dependency>
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
-      <version>${version.liquibase}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>${version.postgresclient}</version>
-      <optional>true</optional>
+      <version>3.9.0</version>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
