@@ -26,7 +26,9 @@ import com.github.raffaeleragni.apilab.rest.auth.ImmutableConfiguration;
 import com.github.raffaeleragni.apilab.rest.auth.JavalinJWTAccessManager;
 import com.github.raffaeleragni.apilab.rest.auth.JavalinJWTFilter;
 import dagger.Provides;
+import dagger.multibindings.IntoMap;
 import dagger.multibindings.IntoSet;
+import dagger.multibindings.StringKey;
 import io.javalin.Javalin;
 import io.javalin.plugin.json.JavalinJackson;
 import io.javalin.plugin.openapi.InitialConfigurationCreator;
@@ -62,6 +64,17 @@ public class RESTModule {
 
   @Provides @IntoSet ApplicationService service(RESTService service) {
     return service;
+  }
+
+  @Provides
+  @Singleton
+  @Named("healthChecks")
+  @IntoMap
+  @StringKey("javalin")
+  public Supplier<Boolean> apiHealthCheck() {
+    // This is used to fill in the map so that it is not empty
+    // when the user uses the api only.
+    return () -> true;
   }
 
   @Provides @Singleton
